@@ -1,0 +1,317 @@
+:root {
+  --main-color-black: #0D0D0D;
+  --main-color-white: #FFFFFF;
+  --btn-color-gray: #D6D7DB;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+
+/* Общий контейнер */
+.container {
+  display: flex;
+  height: 100vh;
+  transition: .3s;
+}
+
+/* Основной контент (Блок с картинкой) */
+.main-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: .3s;
+  padding: 20px;
+}
+.model-block {
+  width: 100%;
+  height: fit-content;
+  position: relative;
+}
+.model-img {
+  height: fit-content;
+}
+.model-img img {
+  width: 100%;
+  height: 100%;
+  max-height: calc(100vh - 4px);
+}
+
+/* Кнопки на макете */
+.object-button {
+  position: absolute;
+  padding: 10px 20px;
+  background: var(--btn-color-gray);
+  color: var(--main-color-black);
+  border: none;
+  border-radius: 100%;
+  cursor: pointer;
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+/* Боковое меню */
+.sidebar {
+  width: 32px;
+  overflow: hidden;
+  background: var(--main-color-black);
+  color: var(--btn-color-gray);
+  transition: .3s;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
+}
+.sidebar.open {
+  width: 250px;
+}
+.menu-content {
+  opacity: 0;
+  transition: .5s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 230px;
+}
+.sidebar.open .menu-content {
+  opacity: 1;
+}
+
+/* Бургер в меню */
+.burger {
+  display: block;
+  position: relative;
+  width: 16px;
+  min-height: 32px;
+  cursor: pointer;
+  border: none;
+  background: inherit;
+  transform: translateX(-50%);
+}
+.burger:before {
+  content: '';
+  position: absolute;
+  background-color: var(--main-color-white);
+  width: 100%;
+  height: 3px;
+  top: 25%;
+  transition: .2s all;
+}
+.burger:after {
+  content: '';
+  position: absolute;
+  background-color: var(--main-color-white);
+  width: 100%;
+  height: 3px;
+  bottom: 25%;
+  transition: .2s all;
+}
+.burger i {
+  opacity: 1;
+  position: absolute;
+  background-color: var(--main-color-white);
+  width: 100%;
+  height: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: .2S all;
+}
+.burger.active i {
+  opacity: 0;
+  width: 0%;
+}
+.burger.active:before {
+  top: 50%;
+  transform: rotate(45deg);
+  border-radius: 4px;
+  transition: .2s all;
+}
+.burger.active:after {
+  top: 50%;
+  transform: rotate(-45deg);
+  border-radius: 4px;
+  transition: .2s all;
+}
+.burger:focus-visible i {
+  width: 90%;
+  transition: .2S all;
+}
+@media (hover:hover) {
+  .burger:hover i {
+      width: 90%;
+      transition: .2S all;
+  }
+  .burger.active:hover:after, .burger.active:hover:before {
+      opacity: .8;
+  }
+}
+
+/* Блоки в меню */
+.menu-fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border: 2px solid var(--btn-color-gray);
+  margin: 0;
+  width: 100%;
+}
+.menu-fieldset legend {
+  text-align: center;
+  font-size: 18px;
+  padding-top: 3px;
+}
+.menu-fieldset legend span {
+  content: '?';
+  border: 1px solid var(--main-color-white);
+  border-radius: 50%;
+  padding: 0 5px;
+  cursor: pointer;
+}
+.menu-fieldset.menu-fieldset__points {
+  overflow-y: auto;
+}
+
+/* Радиокнопки в меню */
+.menu-radio input[type="radio"] {
+  display: none;
+}
+.menu-radio label {
+  width: 100%;
+  display: block;
+  text-align: center;
+  padding: 5px;
+  background: var(--main-color-black);
+  color: var(--main-color-white);
+  border: 1px solid var(--btn-color-gray);
+  border-radius: 10px;
+  transition: .3s;
+  cursor: pointer;
+}
+.menu-radio input[type="radio"]:checked + label {
+  background: var(--main-color-white);
+  color: var(--main-color-black);
+}
+@media (hover:hover) {
+  .menu-radio label:hover {
+      background: var(--btn-color-gray);
+      color: var(--main-color-black);
+  }
+}
+
+/* Поля ввода в меню */
+.menu-input {
+  width: calc(100% - 10px);
+}
+.menu-input input {
+  background: var(--btn-color-gray);
+  border: none;
+  padding: 5px 10px;
+  width: 100%;
+  border-radius: 5px;
+}
+
+/* Список объектов в меню */
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px;
+  overflow-y: auto;
+}
+.menu-list { /* Стили скрола */
+  scrollbar-width: thin; /* Для Firefox */
+  scrollbar-color: var(--main-color-black) var(--btn-color-gray);
+}
+.menu-list::-webkit-scrollbar { /* Для WebKit-браузеров (Chrome, Safari, Edge) */
+  width: 8px; /* Толщина полосы */
+}
+.menu-list::-webkit-scrollbar-thumb {
+  background: var(--main-color-black); /* Цвет ползунка */
+  border-radius: 4px;
+}
+.menu-list::-webkit-scrollbar-track {
+  background: var(--btn-color-gray); /* Цвет фона скролла */
+}
+.menu-list__element {
+  padding: 10px;
+  border: 1px solid var(--btn-color-gray);
+  border-radius: 10px;
+  transition: .3s;
+  cursor: pointer;
+}
+.menu-list__element.active {
+  background: var(--main-color-white);
+  color: var(--main-color-black);
+}
+@media (hover:hover) {
+  .menu-list__element:hover {
+      background: var(--btn-color-gray);
+      color: var(--main-color-black);
+  }
+}
+
+/* Модальное окно (для подсказок) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+  z-index: 10;
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 80%;
+  transform: translateY(-30px);
+  transition: transform 0.5s ease;
+  overflow-y: auto;
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.modal-content__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 24px;
+  font-weight: 700;
+}
+.modal-content__title button {
+  border: none;
+  background: inherit;
+  cursor: pointer;
+  transition: .3s;
+}
+.modal-content__title button:active, .modal-content__title button:hover {
+  opacity: .7;
+}
+.modal-overlay.open .modal-content {
+  transform: translateY(0);
+}
+.modal-background {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
