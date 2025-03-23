@@ -18569,13 +18569,13 @@ parcelHelpers.export(exports, "App", ()=>App);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
-var _s = $RefreshSig$();
+var _s = $RefreshSig$(), _s1 = $RefreshSig$();
 const settings = {
     api: {
         url: "http://localhost:5000/api/location",
         objectId: "123"
     },
-    titleRadio: "\u0420\u0435\u0436\u0438\u043C \u0440\u0430\u0431\u043E\u0442\u044B",
+    titleRadio: "\u0422\u0430\u0431\u043B\u0438\u0446\u044B",
     titleInput: "\u0424\u0438\u043B\u044C\u0442\u0440 \u0434\u0430\u0442\u044B",
     titleList: "\u0422\u043E\u0447\u043A\u0438",
     inputDate: [
@@ -18588,55 +18588,26 @@ const settings = {
             desc: "\u0414\u0430\u0442\u0430 \u0434\u043E"
         }
     ],
-    radioModes: [
+    tablesDB: [
         {
-            id: "track",
-            desc: "\u041E\u0442\u0441\u043B\u0435\u0436\u0438\u0432\u0430\u0442\u044C \u043F\u043E\u0441\u043B\u0435\u0434\u043D\u0435\u0435"
-        },
-        {
-            id: "history",
-            desc: "\u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043C\u0435\u0441\u0442\u043E\u043F\u043E\u043B\u043E\u0436\u0435\u043D\u0438\u0439"
+            id: "sensors",
+            desc: "\u0422\u0430\u0431\u043B\u0438\u0446\u044B \u0411\u0414"
         }
     ],
-    promts: {
-        promtList: {
-            title: "\u0422\u043E\u0447\u043A\u0438",
-            desc: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0442\u043E\u0447\u0435\u043A"
-        },
-        promtRadio: {
-            title: "\u0420\u0435\u0436\u0438\u043C \u0440\u0430\u0431\u043E\u0442\u044B",
-            desc: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0440\u0435\u0436\u0438\u043C\u043E\u0432 \u0440\u0430\u0431\u043E\u0442\u044B"
-        },
-        promtInput: {
-            title: "\u0424\u0438\u043B\u044C\u0442\u0440 \u0434\u0430\u0442\u044B",
-            desc: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0444\u0438\u043B\u044C\u0442\u0440\u0430 \u0434\u0430\u0442\u044B"
-        }
-    },
     img: {
         width: 993,
         height: 656
     }
 };
-function MenuDateInput({ title, inputDate, openModal, promt, onChange }) {
+function MenuDateInput({ title, inputDate, onChange }) {
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("fieldset", {
         className: "menu-fieldset",
         children: [
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("legend", {
-                children: [
-                    title,
-                    " ",
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                        onClick: ()=>openModal(promt),
-                        children: "?"
-                    }, void 0, false, {
-                        fileName: "src/App.js",
-                        lineNumber: 31,
-                        columnNumber: 29
-                    }, this)
-                ]
-            }, void 0, true, {
+                children: title
+            }, void 0, false, {
                 fileName: "src/App.js",
-                lineNumber: 31,
+                lineNumber: 25,
                 columnNumber: 13
             }, this),
             inputDate.map((date)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -18647,7 +18618,7 @@ function MenuDateInput({ title, inputDate, openModal, promt, onChange }) {
                             children: date.desc
                         }, void 0, false, {
                             fileName: "src/App.js",
-                            lineNumber: 35,
+                            lineNumber: 29,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
@@ -18657,102 +18628,77 @@ function MenuDateInput({ title, inputDate, openModal, promt, onChange }) {
                             onChange: (e)=>onChange(date.id, e.target.value)
                         }, void 0, false, {
                             fileName: "src/App.js",
-                            lineNumber: 36,
+                            lineNumber: 30,
                             columnNumber: 21
                         }, this)
                     ]
                 }, date.id, true, {
                     fileName: "src/App.js",
-                    lineNumber: 34,
+                    lineNumber: 28,
                     columnNumber: 17
                 }, this))
         ]
     }, void 0, true, {
         fileName: "src/App.js",
-        lineNumber: 30,
+        lineNumber: 24,
         columnNumber: 9
     }, this);
 }
 _c = MenuDateInput;
-function MenuRadio({ title, radioModes, openModal, promt }) {
+function MenuDB({ title, tablesDB, openModal }) {
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("fieldset", {
         className: "menu-fieldset",
         children: [
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("legend", {
-                children: [
-                    title,
-                    " ",
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                        onClick: ()=>openModal(promt),
-                        children: "?"
-                    }, void 0, false, {
-                        fileName: "src/App.js",
-                        lineNumber: 48,
-                        columnNumber: 29
-                    }, this)
-                ]
-            }, void 0, true, {
+                children: title
+            }, void 0, false, {
                 fileName: "src/App.js",
-                lineNumber: 48,
+                lineNumber: 42,
                 columnNumber: 13
             }, this),
-            radioModes.map((mode)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                    className: "menu-radio",
-                    children: [
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
-                            type: "radio",
-                            id: mode.id,
-                            name: "menu-radio",
-                            value: mode.id
-                        }, void 0, false, {
-                            fileName: "src/App.js",
-                            lineNumber: 52,
-                            columnNumber: 21
-                        }, this),
-                        /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
-                            htmlFor: mode.id,
-                            children: mode.desc
-                        }, void 0, false, {
-                            fileName: "src/App.js",
-                            lineNumber: 53,
-                            columnNumber: 21
-                        }, this)
-                    ]
-                }, mode.id, true, {
+            tablesDB.map((mode)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                    className: "menu-db",
+                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+                        type: "button",
+                        onClick: ()=>openModal(),
+                        children: mode.desc
+                    }, void 0, false, {
+                        fileName: "src/App.js",
+                        lineNumber: 46,
+                        columnNumber: 21
+                    }, this)
+                }, mode.id, false, {
                     fileName: "src/App.js",
-                    lineNumber: 51,
+                    lineNumber: 45,
                     columnNumber: 17
                 }, this))
         ]
     }, void 0, true, {
         fileName: "src/App.js",
-        lineNumber: 47,
+        lineNumber: 41,
         columnNumber: 9
     }, this);
 }
-_c1 = MenuRadio;
+_c1 = MenuDB;
 function MenuFilter({ openModal, onInputDate }) {
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
         children: [
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(MenuRadio, {
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(MenuDB, {
                 title: settings.titleRadio,
-                radioModes: settings.radioModes,
-                openModal: openModal,
-                promt: settings.promts.promtRadio
+                tablesDB: settings.tablesDB,
+                openModal: openModal
             }, void 0, false, {
                 fileName: "src/App.js",
-                lineNumber: 65,
+                lineNumber: 58,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(MenuDateInput, {
                 title: settings.titleInput,
                 inputDate: settings.inputDate,
-                openModal: openModal,
-                promt: settings.promts.promtInput,
                 onChange: onInputDate
             }, void 0, false, {
                 fileName: "src/App.js",
-                lineNumber: 71,
+                lineNumber: 63,
                 columnNumber: 13
             }, this)
         ]
@@ -18776,7 +18722,7 @@ function MenuElement({ index, point, active, onClick }) {
                 ]
             }, void 0, true, {
                 fileName: "src/App.js",
-                lineNumber: 90,
+                lineNumber: 80,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -18786,7 +18732,7 @@ function MenuElement({ index, point, active, onClick }) {
                 ]
             }, void 0, true, {
                 fileName: "src/App.js",
-                lineNumber: 91,
+                lineNumber: 81,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -18796,37 +18742,26 @@ function MenuElement({ index, point, active, onClick }) {
                 ]
             }, void 0, true, {
                 fileName: "src/App.js",
-                lineNumber: 92,
+                lineNumber: 82,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "src/App.js",
-        lineNumber: 86,
+        lineNumber: 76,
         columnNumber: 9
     }, this);
 }
 _c3 = MenuElement;
-function MenuList({ title, points, activeIndexes, toggleActive, openModal, promt }) {
+function MenuList({ title, points, activeIndexes, toggleActive }) {
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("fieldset", {
         className: "menu-fieldset menu-fieldset__points",
         children: [
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("legend", {
-                children: [
-                    title,
-                    " ",
-                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                        onClick: ()=>openModal(promt),
-                        children: "?"
-                    }, void 0, false, {
-                        fileName: "src/App.js",
-                        lineNumber: 101,
-                        columnNumber: 29
-                    }, this)
-                ]
-            }, void 0, true, {
+                children: title
+            }, void 0, false, {
                 fileName: "src/App.js",
-                lineNumber: 101,
+                lineNumber: 91,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -18835,7 +18770,7 @@ function MenuList({ title, points, activeIndexes, toggleActive, openModal, promt
                     children: "\u0422\u043E\u0447\u043A\u0438 \u043E\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u044E\u0442"
                 }, void 0, false, {
                     fileName: "src/App.js",
-                    lineNumber: 104,
+                    lineNumber: 94,
                     columnNumber: 21
                 }, this) : points?.map((point, index)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(MenuElement, {
                         index: index,
@@ -18844,18 +18779,18 @@ function MenuList({ title, points, activeIndexes, toggleActive, openModal, promt
                         onClick: ()=>toggleActive(index)
                     }, index, false, {
                         fileName: "src/App.js",
-                        lineNumber: 106,
+                        lineNumber: 96,
                         columnNumber: 25
                     }, this))
             }, void 0, false, {
                 fileName: "src/App.js",
-                lineNumber: 102,
+                lineNumber: 92,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "src/App.js",
-        lineNumber: 100,
+        lineNumber: 90,
         columnNumber: 9
     }, this);
 }
@@ -18869,12 +18804,12 @@ function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleA
                 onClick: ()=>setIsMenuOpen(!isMenuOpen),
                 children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("i", {}, void 0, false, {
                     fileName: "src/App.js",
-                    lineNumber: 123,
+                    lineNumber: 113,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "src/App.js",
-                lineNumber: 122,
+                lineNumber: 112,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -18885,36 +18820,94 @@ function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleA
                         onInputDate: onInputDate
                     }, void 0, false, {
                         fileName: "src/App.js",
-                        lineNumber: 126,
+                        lineNumber: 116,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(MenuList, {
                         title: settings.titleList,
                         points: points,
                         activeIndexes: activeIndexes,
-                        toggleActive: toggleActive,
-                        openModal: openModal,
-                        promt: settings.promts.promtList
+                        toggleActive: toggleActive
                     }, void 0, false, {
                         fileName: "src/App.js",
-                        lineNumber: 130,
+                        lineNumber: 120,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "src/App.js",
-                lineNumber: 125,
+                lineNumber: 115,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "src/App.js",
-        lineNumber: 121,
+        lineNumber: 111,
         columnNumber: 9
     }, this);
 }
 _c5 = SidebarMenu;
 function Model({ points, activeIndexes }) {
+    const renderRoute = ()=>{
+        if (activeIndexes.length < 2) return null;
+        const sortedIndexes = [
+            ...activeIndexes
+        ].sort((a, b)=>a - b);
+        const routePoints = sortedIndexes.map((index)=>({
+                x: points[index].x / settings.img.width * 100,
+                y: points[index].y / settings.img.height * 100
+            }));
+        const pathData = routePoints.map((point, i)=>i === 0 ? `M ${point.x} ${100 - point.y}` : `L ${point.x} ${100 - point.y}`).join(' ');
+        return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("svg", {
+            className: "route-svg",
+            viewBox: "0 0 100 100",
+            preserveAspectRatio: "none",
+            children: [
+                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("defs", {
+                    children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("marker", {
+                        id: "arrow",
+                        markerWidth: "3",
+                        markerHeight: "3",
+                        refX: "-4",
+                        refY: "1.5",
+                        orient: "auto",
+                        markerUnits: "strokeWidth",
+                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("path", {
+                            d: "M3,0 L0,1.5 L3,3",
+                            fill: "black"
+                        }, void 0, false, {
+                            fileName: "src/App.js",
+                            lineNumber: 151,
+                            columnNumber: 25
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "src/App.js",
+                        lineNumber: 150,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "src/App.js",
+                    lineNumber: 149,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("path", {
+                    d: pathData,
+                    stroke: "black",
+                    strokeWidth: "0.5",
+                    fill: "none",
+                    markerStart: "url(#arrow)"
+                }, void 0, false, {
+                    fileName: "src/App.js",
+                    lineNumber: 155,
+                    columnNumber: 17
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "src/App.js",
+            lineNumber: 148,
+            columnNumber: 13
+        }, this);
+    };
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         className: "main-content",
         children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -18929,12 +18922,12 @@ function Model({ points, activeIndexes }) {
                         draggable: "false"
                     }, void 0, false, {
                         fileName: "src/App.js",
-                        lineNumber: 149,
+                        lineNumber: 164,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "src/App.js",
-                    lineNumber: 148,
+                    lineNumber: 163,
                     columnNumber: 17
                 }, this),
                 activeIndexes?.map((index)=>{
@@ -18949,24 +18942,39 @@ function Model({ points, activeIndexes }) {
                         children: index + 1
                     }, index, false, {
                         fileName: "src/App.js",
-                        lineNumber: 158,
+                        lineNumber: 173,
                         columnNumber: 25
                     }, this);
-                })
+                }),
+                renderRoute()
             ]
         }, void 0, true, {
             fileName: "src/App.js",
-            lineNumber: 147,
+            lineNumber: 162,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "src/App.js",
-        lineNumber: 146,
+        lineNumber: 161,
         columnNumber: 9
     }, this);
 }
 _c6 = Model;
-function DescModal({ closeModal, isModalOpen, promt }) {
+function DescModal({ closeModal, isModalOpen }) {
+    _s();
+    const [activeTab, setActiveTab] = (0, _react.useState)("sensor1");
+    const [points, setPoints] = (0, _react.useState)([]);
+    const fetchDataPoints = ()=>{
+        let url = `${settings.api.url}?object_id=${settings.api.objectId}&to_time=${new Date().toISOString()}`;
+        fetch(url).then((response)=>response.json()).then((data)=>setPoints(data.locations)).catch((err)=>console.error("\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438:", err));
+    };
+    const tablePoints = ()=>{
+        fetchDataPoints();
+        handleTabClick("sensor2");
+    };
+    const handleTabClick = (tab)=>{
+        setActiveTab(tab);
+    };
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         className: `modal-overlay ${isModalOpen ? "open" : ""}`,
         children: [
@@ -18975,7 +18983,7 @@ function DescModal({ closeModal, isModalOpen, promt }) {
                 onClick: closeModal
             }, void 0, false, {
                 fileName: "src/App.js",
-                lineNumber: 175,
+                lineNumber: 212,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -18985,10 +18993,10 @@ function DescModal({ closeModal, isModalOpen, promt }) {
                         className: "modal-content__title",
                         children: [
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("span", {
-                                children: promt.title
+                                children: "\u0422\u0430\u0431\u043B\u0438\u0446\u044B \u0411\u0414"
                             }, void 0, false, {
                                 fileName: "src/App.js",
-                                lineNumber: 178,
+                                lineNumber: 215,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
@@ -18997,58 +19005,482 @@ function DescModal({ closeModal, isModalOpen, promt }) {
                                     className: "fas fa-times"
                                 }, void 0, false, {
                                     fileName: "src/App.js",
-                                    lineNumber: 180,
+                                    lineNumber: 217,
                                     columnNumber: 25
                                 }, this)
                             }, void 0, false, {
                                 fileName: "src/App.js",
-                                lineNumber: 179,
+                                lineNumber: 216,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "src/App.js",
-                        lineNumber: 177,
+                        lineNumber: 214,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-                        className: "modal-content__text",
-                        children: promt.desc
-                    }, void 0, false, {
+                        className: "modal-content__tabs",
+                        children: [
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+                                onClick: ()=>handleTabClick("sensor1"),
+                                className: activeTab === "sensor1" ? "active" : "",
+                                children: "\u0421\u0432\u043E\u0439\u0441\u0442\u0432\u0430 \u0434\u0430\u0442\u0447\u0438\u043A\u043E\u0432"
+                            }, void 0, false, {
+                                fileName: "src/App.js",
+                                lineNumber: 222,
+                                columnNumber: 21
+                            }, this),
+                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("button", {
+                                onClick: ()=>tablePoints(),
+                                className: activeTab === "sensor2" ? "active" : "",
+                                children: "\u0418\u0441\u0442\u043E\u0440\u0438\u044F \u043C\u0435\u0441\u0442\u043E\u043F\u043E\u043B\u043E\u0436\u0435\u043D\u0438\u0439"
+                            }, void 0, false, {
+                                fileName: "src/App.js",
+                                lineNumber: 228,
+                                columnNumber: 21
+                            }, this)
+                        ]
+                    }, void 0, true, {
                         fileName: "src/App.js",
-                        lineNumber: 183,
+                        lineNumber: 221,
+                        columnNumber: 17
+                    }, this),
+                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                        className: "modal-content__table",
+                        children: [
+                            activeTab === "sensor1" && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("table", {
+                                children: [
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("thead", {
+                                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("tr", {
+                                            children: [
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "id"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 241,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 242,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "\u041C\u043E\u0434\u0435\u043B\u044C"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 243,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "\u041A\u043E\u043C\u043F\u043B\u0435\u043A\u0442\u0430\u0446\u0438\u044F"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 244,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "\u0421\u0435\u0440\u0438\u0439\u043D\u0438\u043A"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 245,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "Mac-\u0430\u0434\u0440\u0435\u0441"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 246,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "\u0414\u0430\u0442\u0430 \u044D\u043A\u0441\u043F\u043B\u0443\u0430\u0442\u0430\u0446\u0438\u0438"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 247,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "\u0421\u043F\u0438\u0441\u0430\u043D"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 248,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "\u0413\u0430\u0440\u0430\u043D\u0442\u0438\u0439\u043D\u0430\u044F \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 249,
+                                                    columnNumber: 37
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "src/App.js",
+                                            lineNumber: 240,
+                                            columnNumber: 33
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "src/App.js",
+                                        lineNumber: 239,
+                                        columnNumber: 29
+                                    }, this),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("tbody", {
+                                        children: [
+                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("tr", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "1"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 254,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u0414\u0430\u0442\u0447\u0438\u043A \u0442\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u044B"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 255,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "DT-100"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 256,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u0422\u0435\u0440\u043C\u043E\u0434\u0430\u0442\u0447\u0438\u043A + \u043A\u0440\u0435\u043F\u0435\u0436"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 257,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "SN123456"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 258,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "00:1A:2B:3C:4D:5E"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 259,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "2023-05-10"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 260,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u041D\u0435\u0442"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 261,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u0413\u0430\u0440\u0430\u043D\u0442\u0438\u044F \u0434\u043E 2026-05-10"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 262,
+                                                        columnNumber: 37
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "src/App.js",
+                                                lineNumber: 253,
+                                                columnNumber: 33
+                                            }, this),
+                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("tr", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "2"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 265,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u0414\u0430\u0442\u0447\u0438\u043A \u0432\u043B\u0430\u0436\u043D\u043E\u0441\u0442\u0438"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 266,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "DH-200"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 267,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u0414\u0430\u0442\u0447\u0438\u043A + \u043C\u043E\u0434\u0443\u043B\u044C \u0441\u0432\u044F\u0437\u0438"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 268,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "SN654321"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 269,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "00:1B:3D:5F:7A:9C"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 270,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "2022-11-23"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 271,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u041D\u0435\u0442"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 272,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u0413\u0430\u0440\u0430\u043D\u0442\u0438\u044F \u0434\u043E 2025-11-23"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 273,
+                                                        columnNumber: 37
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "src/App.js",
+                                                lineNumber: 264,
+                                                columnNumber: 33
+                                            }, this),
+                                            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("tr", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "3"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 276,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u0414\u0430\u0442\u0447\u0438\u043A \u0434\u0430\u0432\u043B\u0435\u043D\u0438\u044F"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 277,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "DP-300"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 278,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u0414\u0430\u0442\u0447\u0438\u043A + \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u043D\u044B\u0439 \u043A\u0430\u0431\u0435\u043B\u044C"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 279,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "SN789012"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 280,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "00:2C:4E:6F:8B:AD"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 281,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "2021-08-15"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 282,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u0414\u0430"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 283,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: "\u0413\u0430\u0440\u0430\u043D\u0442\u0438\u044F \u0438\u0441\u0442\u0435\u043A\u043B\u0430"
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 284,
+                                                        columnNumber: 37
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "src/App.js",
+                                                lineNumber: 275,
+                                                columnNumber: 33
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "src/App.js",
+                                        lineNumber: 252,
+                                        columnNumber: 29
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "src/App.js",
+                                lineNumber: 238,
+                                columnNumber: 25
+                            }, this),
+                            activeTab === "sensor2" && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("table", {
+                                children: [
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("thead", {
+                                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("tr", {
+                                            children: [
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "id"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 294,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "x"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 295,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "y"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 296,
+                                                    columnNumber: 37
+                                                }, this),
+                                                /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("th", {
+                                                    children: "\u0412\u0440\u0435\u043C\u044F"
+                                                }, void 0, false, {
+                                                    fileName: "src/App.js",
+                                                    lineNumber: 297,
+                                                    columnNumber: 37
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "src/App.js",
+                                            lineNumber: 293,
+                                            columnNumber: 33
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "src/App.js",
+                                        lineNumber: 292,
+                                        columnNumber: 29
+                                    }, this),
+                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("tbody", {
+                                        children: points?.map((point, index)=>/*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("tr", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: index
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 303,
+                                                        columnNumber: 41
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: point.x
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 304,
+                                                        columnNumber: 41
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: point.y
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 305,
+                                                        columnNumber: 41
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("td", {
+                                                        children: point.timestamp
+                                                    }, void 0, false, {
+                                                        fileName: "src/App.js",
+                                                        lineNumber: 306,
+                                                        columnNumber: 41
+                                                    }, this)
+                                                ]
+                                            }, index, true, {
+                                                fileName: "src/App.js",
+                                                lineNumber: 302,
+                                                columnNumber: 37
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "src/App.js",
+                                        lineNumber: 300,
+                                        columnNumber: 29
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "src/App.js",
+                                lineNumber: 291,
+                                columnNumber: 25
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "src/App.js",
+                        lineNumber: 236,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "src/App.js",
-                lineNumber: 176,
+                lineNumber: 213,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "src/App.js",
-        lineNumber: 174,
+        lineNumber: 211,
         columnNumber: 9
     }, this);
 }
+_s(DescModal, "80u+0OX1UgtH3oZOdcbAO11nrvM=");
 _c7 = DescModal;
 function App() {
-    _s();
+    _s1();
     const [points, setPoints] = (0, _react.useState)([]);
     const [dateFrom, setDateFrom] = (0, _react.useState)(null);
     const [dateTo, setDateTo] = (0, _react.useState)(null);
     const [isModalOpen, setIsModalOpen] = (0, _react.useState)(false);
-    const [promt, setPromt] = (0, _react.useState)({
-        title: "",
-        desc: ""
-    });
     const [isMenuOpen, setIsMenuOpen] = (0, _react.useState)(false);
     const [activeIndexes, setActiveIndexes] = (0, _react.useState)([]);
     const onInputDate = (type, value)=>{
         const date = new Date(value);
         // Корректировка временной зоны
         date.setHours(date.getHours() + 3);
+        console.log(date);
         if (isNaN(date.getTime())) {
             console.warn("Invalid date input");
             if (type === settings.inputDate[0].id) setDateFrom(null);
@@ -19073,8 +19505,7 @@ function App() {
         dateFrom,
         dateTo
     ]);
-    const openModalWithPromt = (promt)=>{
-        setPromt(promt);
+    const openModal = ()=>{
         setIsModalOpen(true);
     };
     const toggleActive = (index)=>{
@@ -19088,11 +19519,10 @@ function App() {
         children: [
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(DescModal, {
                 closeModal: ()=>setIsModalOpen(false),
-                isModalOpen: isModalOpen,
-                promt: promt
+                isModalOpen: isModalOpen
             }, void 0, false, {
                 fileName: "src/App.js",
-                lineNumber: 251,
+                lineNumber: 377,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -19103,8 +19533,8 @@ function App() {
                         activeIndexes: activeIndexes
                     }, void 0, false, {
                         fileName: "src/App.js",
-                        lineNumber: 253,
-                        columnNumber: 13
+                        lineNumber: 382,
+                        columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)(SidebarMenu, {
                         isMenuOpen: isMenuOpen,
@@ -19112,31 +19542,31 @@ function App() {
                         points: points,
                         activeIndexes: activeIndexes,
                         toggleActive: toggleActive,
-                        openModal: openModalWithPromt,
+                        openModal: openModal,
                         onInputDate: onInputDate
                     }, void 0, false, {
                         fileName: "src/App.js",
-                        lineNumber: 254,
-                        columnNumber: 13
+                        lineNumber: 383,
+                        columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "src/App.js",
-                lineNumber: 252,
+                lineNumber: 381,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "src/App.js",
-        lineNumber: 250,
+        lineNumber: 376,
         columnNumber: 9
     }, this);
 }
-_s(App, "luDRxPcPWX1PdwxaBSD79nEpkac=");
+_s1(App, "YhcD6KwP5L+Rh9dNoYyhj7TptCQ=");
 _c8 = App;
 var _c, _c1, _c2, _c3, _c4, _c5, _c6, _c7, _c8;
 $RefreshReg$(_c, "MenuDateInput");
-$RefreshReg$(_c1, "MenuRadio");
+$RefreshReg$(_c1, "MenuDB");
 $RefreshReg$(_c2, "MenuFilter");
 $RefreshReg$(_c3, "MenuElement");
 $RefreshReg$(_c4, "MenuList");
