@@ -43,16 +43,18 @@ body {
 
 /* Кнопки на макете */
 .object-button {
-  position: absolute;
-  padding: 10px 20px;
   background: var(--btn-color-gray);
   color: var(--main-color-black);
+  cursor: pointer;
   border: none;
   border-radius: 100%;
-  cursor: pointer;
-  font-size: 64px;
-  line-height: 1;
+  padding: 5px 10px;
+  font-size: 32px;
   font-weight: 700;
+  line-height: 1;
+  position: absolute;
+  transform: translate(-50%, 50%);
+  z-index: 1;
 }
 
 /* Боковое меню */
@@ -179,6 +181,18 @@ body {
 }
 
 /* Радиокнопки в меню */
+.menu-db button {
+  text-align: center;
+  background: var(--main-color-black);
+  width: 100%;
+  color: var(--main-color-white);
+  border: 1px solid var(--btn-color-gray);
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 5px;
+  transition: all .3s;
+  display: block;
+}
 .menu-radio input[type="radio"] {
   display: none;
 }
@@ -199,6 +213,10 @@ body {
   color: var(--main-color-black);
 }
 @media (hover:hover) {
+  .menu-db button:hover {
+    background: var(--btn-color-gray);
+    color: var(--main-color-black);
+  }
   .menu-radio label:hover {
       background: var(--btn-color-gray);
       color: var(--main-color-black);
@@ -280,7 +298,6 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  width: 400px;
   max-width: 80%;
   transform: translateY(-30px);
   transition: transform 0.5s ease;
@@ -315,3 +332,73 @@ body {
   width: 100%;
   height: 100%;
 }
+.modal-content__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.modal-content__tabs button {
+  text-align: center;
+  background: var(--main-color-white);
+  color: var(--main-color-black);
+  border: 1px solid var(--btn-color-gray);
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 5px;
+  transition: all .3s;
+  display: block;
+}
+.modal-content__tabs button.active {
+  background: var(--main-color-black);
+  color: var(--main-color-white);
+}
+@media (hover:hover) {
+  .modal-content__tabs button:hover {
+      background: var(--btn-color-gray);
+      color: var(--main-color-black);
+  }
+}
+.modal-content__table {
+  overflow-y: auto;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    color: black;
+    background: white;
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid black;
+  }
+
+  th, td {
+    border: 1px solid black;
+    padding: 10px;
+    text-align: left;
+  }
+
+  thead {
+    background: #000;
+    color: #fff;
+  }
+
+  tbody tr:nth-child(even) {
+    background: #f2f2f2;
+  }
+
+  tbody tr:hover {
+    background: #ddd;
+  }
+}
+
+/* Маршрут */
+.route-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
