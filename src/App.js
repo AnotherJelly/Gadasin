@@ -1,9 +1,11 @@
 import React, { StrictMode, useState, useEffect } from "react";
+import testImage from './test.png';
 
 const settings = {
     api: {
         url: "http://localhost:5000/api/location",
-        objectId: "123",
+        objectId: "1",
+        time: 5000
     },
     titleRadio: "Таблицы",
     titleInput: "Фильтр даты",
@@ -15,7 +17,7 @@ const settings = {
     tablesDB: [
         { id: "sensors", desc: "Таблицы БД" },
     ],
-    img: { width: 993, height: 656 }
+    img: { width: 340, height: 295 }
 }
 
 function MenuDateInput({ title, inputDate, onChange }) {
@@ -70,7 +72,7 @@ function MenuFilter({ openModal, onInputDate }) {
 }
 
 function MenuElement({ index, point, active, onClick }) {
-    const [date, time] = point.timestamp.split("T");
+    const [date, time] = point?.timestamp.split("T");
 
     return(
         <div 
@@ -130,6 +132,8 @@ function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleA
 
 function Model({ points, activeIndexes }) {
 
+    const [infoBox, setInfoBox] = useState(null);
+
     const renderRoute = () => {
         if (activeIndexes.length < 2) return null;
     
@@ -141,14 +145,14 @@ function Model({ points, activeIndexes }) {
         }));
     
         const pathData = routePoints.map((point, i) =>
-            i === 0 ? `M ${point.x} ${100 - point.y}` : `L ${point.x} ${100 - point.y}`
+            i === 0 ? `M ${point.x} ${point.y}` : `L ${point.x} ${point.y}`
         ).join(' ');
     
         return (
             <svg className="route-svg" viewBox="0 0 100 100" preserveAspectRatio="none" >
                 <defs>
-                    <marker id="arrow" markerWidth="3" markerHeight="3" refX="-4" refY="1.5" orient="auto" markerUnits="strokeWidth">
-                        <path d="M3,0 L0,1.5 L3,3" fill="black" />
+                    <marker id="arrow" markerWidth="6" markerHeight="6" refX="-6" refY="3" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,3 L6,6 L4,3 L6,0 Z" fill="black" />
                     </marker>
                 </defs>
     
@@ -161,26 +165,57 @@ function Model({ points, activeIndexes }) {
         <div className="main-content">
             <div className="model-block">
                 <div className="model-img">
-                    <img src="test.png" alt="Чертёж" loading="lazy" draggable="false" />
+                    <div className="model-test">
+                        <div className="model-test__block">
+                            {activeIndexes?.map(index => {
+                                const point = points[index];
+                                const left = (point?.x / settings.img.width) * 100;
+                                const top = (point?.y / settings.img.height) * 100;
+
+                                const handleClick = () => {
+                                    if (infoBox?.index === index) {
+                                        setInfoBox(null); // Скрыть, если уже открыт
+                                    } else {
+                                        [date, time] = point?.timestamp.split("T");
+                                        setInfoBox({
+                                            index,
+                                            date,
+                                            time
+                                        });
+                                    }
+                                };
+
+                                return (
+                                    <div key={index}>
+                                        <button
+                                            onClick={handleClick}
+                                            className={`object-button`}
+                                            style={{ top: `${top}%`, left: `${left}%` }}
+                                        >
+                                            {index + 1}
+                                        </button>
+                                        {infoBox?.index === index && (
+                                            <div
+                                                className="info-box"
+                                                style={{
+                                                    top: `${top}%`,
+                                                    left: `${left}%`,
+                                                }}
+                                            >
+                                                <div>x: {point.x} мм; y: {point.y} мм</div>
+                                                <div>Дата: {infoBox.date}</div>
+                                                <div>Время: {infoBox.time.split(".")[0]}</div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )
+                                })
+                            }
+                            {renderRoute()}
+                        </div>
+                    </div>
+                    <img src={testImage} alt="Чертёж" loading="lazy" draggable="false" />
                 </div>
-
-                {activeIndexes?.map(index => {
-
-                    const left = points[index]?.x/settings.img.width * 100;
-                    const bottom = points[index]?.y/settings.img.height * 100;
-
-                    return (
-                        <button 
-                            key={index} 
-                            className={`object-button`}
-                            style={{ bottom: `${bottom}%`, left: `${left}%` }}
-                        >
-                            {index + 1}
-                        </button>
-                    )
-                })}
-
-                {renderRoute()}
             </div>
         </div>
     );
@@ -191,7 +226,9 @@ function DescModal({ closeModal, isModalOpen }) {
     const [points, setPoints] = useState([]);
 
     const fetchDataPoints = () => {
-        let url = `${settings.api.url}?object_id=${settings.api.objectId}&to_time=${new Date().toISOString()}`;
+        const now = new Date();
+        const from_time = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+        let url = `${settings.api.url}?object_id=${settings.api.objectId}&from_time=${from_time.toISOString()}&to_time=${now.toISOString()}`;
         fetch(url)
             .then((response) => response.json())
             .then((data) => setPoints(data.locations))
@@ -325,7 +362,7 @@ export function App() {
 
     const onInputDate = (type, value) => {
         const date = new Date(value);
-
+        setActiveIndexes([]);
         // Корректировка временной зоны
         date.setHours(date.getHours() + 3);
 
@@ -342,23 +379,26 @@ export function App() {
     };
     
     const fetchData = () => {
-        let url = `${settings.api.url}?object_id=${settings.api.objectId}`;
-        if (dateFrom) {
-            url += `&from_time=${dateFrom.toISOString()}`;
+        const now = new Date();
+        let url = "";
+        if (dateFrom === null && dateTo === null) {
+            url = `${settings.api.url}?object_id=${settings.api.objectId}`;
+        } else {
+            const from_time = dateFrom || new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+            const to_time = dateTo || new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+            url = `${settings.api.url}?object_id=${settings.api.objectId}&from_time=${from_time.toISOString()}&to_time=${to_time.toISOString()}`;
         }
-        if (dateTo) {
-            url += `&to_time=${dateTo.toISOString()}`;
-        }
+        
         fetch(url)
             .then((response) => response.json())
             .then((data) => setPoints(data.locations))
             .catch((err) => console.error("Ошибка загрузки:", err));
     };
 
-    // Обновление данных каждые 5 секунд
+    // Обновление данных каждые settings.api.time секунд
     useEffect(() => {
         fetchData();
-        const intervalId = setInterval(fetchData, 5000);
+        const intervalId = setInterval(fetchData, settings.api.time);
         return () => clearInterval(intervalId);
     }, [dateFrom, dateTo]);
   
