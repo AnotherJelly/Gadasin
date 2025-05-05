@@ -29,12 +29,13 @@ body {
 }
 .model-block {
   width: 100%;
-  height: fit-content;
+  height: 100%;
   position: relative;
 }
 .model-img {
   position: relative;
-  height: fit-content;
+  height: 100%;
+  width: 100%;
 }
 .model-img img {
   width: 100%;
@@ -64,6 +65,38 @@ body {
   white-space: nowrap;
   z-index: 10;
 }
+.sensor-dot {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  border: 1px solid white;
+  transform: translate(-50%, -50%);
+}
+.sensor-dot span {
+  position: absolute;
+  top: -2em;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  background: var(--btn-color-gray);
+  padding: 4px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+div.sensor-dot:nth-child(2) span {
+  top: -1em;
+  left: 4em;
+}
+.sensor-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
 
 /* Кнопки на макете */
 .object-button {
@@ -78,7 +111,7 @@ body {
   line-height: 1;
   position: absolute;
   transform: translate(-50%, -50%);
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Боковое меню */

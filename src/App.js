@@ -1,23 +1,26 @@
-import React, { StrictMode, useState, useEffect } from "react";
-import testImage from './test.png';
+import React, { useState, useEffect } from "react";
 
 const settings = {
     api: {
         url: "http://localhost:5000/api/location",
+        urlSensors: "http://localhost:5000/api/sensors",
         objectId: "1",
-        time: 5000
     },
     titleRadio: "Таблицы",
     titleInput: "Фильтр даты",
     titleList: "Точки",
+    titlButtons: "Обновление данных",
     inputDate: [
         { id: "date_from", desc: "Дата от" },
         { id: "date_to", desc: "Дата до" }
     ],
     tablesDB: [
-        { id: "sensors", desc: "Таблицы БД" },
+        { id: "sensors", desc: "Таблицы БД", mode: () => onClick() },
     ],
-    img: { width: 340, height: 295 }
+    buttonsApi: [
+        { id: "points", desc: "Обновить точки" },
+        { id: "sensors1", desc: "Обновить датчики" },
+    ],
 }
 
 function MenuDateInput({ title, inputDate, onChange }) {
@@ -37,15 +40,32 @@ function MenuDateInput({ title, inputDate, onChange }) {
     );    
 }
 
-function MenuDB({ title, tablesDB, openModal }) {
+function MenuButtons({ title, onClick1, onClick2 }) {
 
     return(
         <fieldset className="menu-fieldset">
             <legend>{title}</legend>
 
-            {tablesDB.map((mode) => (
+            <div className="menu-db">
+                <button type="button" onClick={() => onClick1()}>Обновить точки</button>
+            </div>
+            <div className="menu-db">
+                <button type="button" onClick={() => onClick2()}>Обновить датчики</button>
+            </div>
+
+        </fieldset>
+    );
+}
+
+function MenuDB({ title, buttons, onClick }) {
+
+    return(
+        <fieldset className="menu-fieldset">
+            <legend>{title}</legend>
+
+            {buttons.map((mode) => (
                 <div key={mode.id} className="menu-db">
-                    <button type="button" onClick={() => openModal()}>{mode.desc}</button>
+                    <button type="button" onClick={() => onClick()}>{mode.desc}</button>
                 </div>
             ))}
 
@@ -53,19 +73,24 @@ function MenuDB({ title, tablesDB, openModal }) {
     );
 }
 
-function MenuFilter({ openModal, onInputDate }) {
+function MenuFilter({ openModal, onInputDate, fetchData, fetchSensor }) {
 
     return(
         <>
             <MenuDB
                 title={settings.titleRadio}
-                tablesDB={settings.tablesDB}
-                openModal={openModal}
+                buttons={settings.tablesDB}
+                onClick={openModal}
             />
             <MenuDateInput
                 title={settings.titleInput}
                 inputDate={settings.inputDate}
                 onChange={onInputDate}
+            />
+            <MenuButtons
+                title={settings.titlButtons}
+                onClick1={fetchData}
+                onClick2={fetchSensor}
             />
         </>
     );    
@@ -79,7 +104,7 @@ function MenuElement({ index, point, active, onClick }) {
             className={`menu-list__element ${active ? "active" : ""}`} 
             onClick={onClick}
         >
-            <div>{index + 1}. {point.x} мм, {point.y} мм</div>
+            <div>{index + 1}. {point.x} см, {point.y} см</div>
             <div>Дата: {date}</div>
             <div>Время: {time.split(".")[0]}</div>
         </div>
@@ -108,7 +133,7 @@ function MenuList({ title, points, activeIndexes, toggleActive }) {
     ); 
 }
 
-function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleActive, openModal, onInputDate }) {
+function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleActive, openModal, onInputDate, fetchData, fetchSensor }) {
     return (
         <div className={`sidebar ${isMenuOpen ? "open" : ""}`}>
             <button className={`burger ${isMenuOpen ? "active" : ""}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -118,6 +143,8 @@ function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleA
                 <MenuFilter 
                     openModal={openModal}
                     onInputDate={onInputDate}
+                    fetchData={fetchData}
+                    fetchSensor={fetchSensor}
                 />
                 <MenuList
                     title={settings.titleList}
@@ -130,9 +157,12 @@ function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleA
     );
 }
 
-function Model({ points, activeIndexes }) {
+function Model({ points, activeIndexes, sensors }) {
 
     const [infoBox, setInfoBox] = useState(null);
+
+    const maxX = Math.max(...sensors.map(s => s.x));
+    const maxY = Math.max(...sensors.map(s => s.y));
 
     const renderRoute = () => {
         if (activeIndexes.length < 2) return null;
@@ -140,8 +170,8 @@ function Model({ points, activeIndexes }) {
         const sortedIndexes = [...activeIndexes].sort((a, b) => a - b);
     
         const routePoints = sortedIndexes.map(index => ({
-            x: (points[index].x / settings.img.width) * 100,
-            y: (points[index].y / settings.img.height) * 100
+            x: (points[index].x / maxX) * 100,
+            y: (points[index].y / maxY) * 100
         }));
     
         const pathData = routePoints.map((point, i) =>
@@ -161,16 +191,81 @@ function Model({ points, activeIndexes }) {
         );
     };
 
+    const renderSensorLines = () => {
+        if (!sensors || sensors.length < 2) return null;
+    
+        const scaledPoints = sensors.map(sensor => ({
+            x: (sensor.x / maxX) * 100,
+            y: (sensor.y / maxY) * 100
+        }));
+    
+        const pathData = scaledPoints.map((p, i) =>
+            i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`
+        ).join(' ') + ' Z';
+    
+        return (
+            <svg className="sensor-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d={pathData} stroke="red" strokeWidth="0.4" fill="none" />
+            </svg>
+        );
+    };
+
+    function getAverageSpeed(points, activeIndexes) {
+        if (!activeIndexes || activeIndexes.length < 2) return 0;
+    
+        let totalDistance = 0;
+        let totalTime = 0;
+    
+        for (let i = 1; i < activeIndexes.length; i++) {
+            const p1 = points[activeIndexes[i - 1]];
+            const p2 = points[activeIndexes[i]];
+            const distance = Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
+    
+            const t1 = new Date(p1.timestamp);
+            const t2 = new Date(p2.timestamp);
+            const timeDiff = Math.abs((t2 - t1) / 1000);
+    
+            totalDistance += distance;
+            totalTime += timeDiff;
+        }
+    
+        if (totalTime === 0) return 0;
+
+        console.log(`${totalDistance} / ${totalTime}`);
+    
+        return totalDistance / totalTime;
+    }
+
     return (
         <div className="main-content">
             <div className="model-block">
                 <div className="model-img">
+                    <p>Средняя скорость: {getAverageSpeed(points, activeIndexes).toFixed(2)} см/с</p>
                     <div className="model-test">
                         <div className="model-test__block">
+                            {sensors.map((sensor, i) => {
+                                const left = (sensor.x / maxX) * 100;
+                                const top = (sensor.y / maxY) * 100;
+
+                                return (
+                                    <div
+                                        key={`sensor-${i}`}
+                                        className="sensor-dot"
+                                        style={{
+                                            top: `${top}%`,
+                                            left: `${left}%`,
+                                            position: 'absolute'
+                                        }}
+                                        title={`Датчик ${i + 1}`}
+                                    >
+                                        <span>{sensor.x}; {sensor.y}</span>
+                                    </div>
+                                );
+                            })}
                             {activeIndexes?.map(index => {
                                 const point = points[index];
-                                const left = (point?.x / settings.img.width) * 100;
-                                const top = (point?.y / settings.img.height) * 100;
+                                const left = (point?.x / maxX) * 100;
+                                const top = (point?.y / maxY) * 100;
 
                                 const handleClick = () => {
                                     if (infoBox?.index === index) {
@@ -202,7 +297,7 @@ function Model({ points, activeIndexes }) {
                                                     left: `${left}%`,
                                                 }}
                                             >
-                                                <div>x: {point.x} мм; y: {point.y} мм</div>
+                                                <div>x: {point.x} см; y: {point.y} см</div>
                                                 <div>Дата: {infoBox.date}</div>
                                                 <div>Время: {infoBox.time.split(".")[0]}</div>
                                             </div>
@@ -212,9 +307,9 @@ function Model({ points, activeIndexes }) {
                                 })
                             }
                             {renderRoute()}
+                            {renderSensorLines()}
                         </div>
                     </div>
-                    <img src={testImage} alt="Чертёж" loading="lazy" draggable="false" />
                 </div>
             </div>
         </div>
@@ -354,6 +449,7 @@ function DescModal({ closeModal, isModalOpen }) {
 
 export function App() {
     const [points, setPoints] = useState([]);
+    const [sensors, setSensors] = useState([]);
     const [dateFrom, setDateFrom] = useState(null);
     const [dateTo, setDateTo] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -365,8 +461,6 @@ export function App() {
         setActiveIndexes([]);
         // Корректировка временной зоны
         date.setHours(date.getHours() + 3);
-
-        console.log(date);
     
         if (isNaN(date.getTime())) {
             console.warn("Invalid date input");
@@ -395,12 +489,16 @@ export function App() {
             .catch((err) => console.error("Ошибка загрузки:", err));
     };
 
-    // Обновление данных каждые settings.api.time секунд
-    useEffect(() => {
-        fetchData();
-        const intervalId = setInterval(fetchData, settings.api.time);
-        return () => clearInterval(intervalId);
-    }, [dateFrom, dateTo]);
+    const fetchSensor = () => {
+        let url = settings.api.urlSensors;
+        
+        fetch(url)
+            .then((response) => response.json())
+            .then((data) => setSensors(data))
+            .catch((err) => console.error("Ошибка загрузки:", err));
+
+        console.log(sensors)
+    };
   
     const openModal = () => {
         setIsModalOpen(true);
@@ -419,7 +517,7 @@ export function App() {
                 isModalOpen={isModalOpen}
             />
             <div className={`container ${isMenuOpen ? "menu-open" : ""}`}>
-                <Model points={points} activeIndexes={activeIndexes} />
+                <Model points={points} activeIndexes={activeIndexes} sensors={sensors} />
                 <SidebarMenu
                     isMenuOpen={isMenuOpen}
                     setIsMenuOpen={setIsMenuOpen}
@@ -428,6 +526,8 @@ export function App() {
                     toggleActive={toggleActive}
                     openModal={openModal}
                     onInputDate={onInputDate}
+                    fetchData={fetchData}
+                    fetchSensor={fetchSensor}
                 />
             </div>
         </div>
