@@ -5,7 +5,7 @@ const settings = {
         url: "http://localhost:9000/api/location",
         urlSensors: "http://localhost:9000/api/sensors",
         urlSave: "http://localhost:9000/api/location/save-point",
-        objectId: "1",
+        objectId: "5f0f2e36-d1a6-4f1e-95a4-167f0e14e07c",
     },
     titleRadio: "Таблицы",
     titleInput: "Фильтр даты",
@@ -98,7 +98,8 @@ function MenuFilter({ openModal, onInputDate, fetchData, fetchSensor, savePoint 
 }
 
 function MenuElement({ index, point, active, onClick }) {
-    const [date, time] = point?.timestamp.split("T");
+    const dateTime = new Date(point?.timestamp * 1000).toISOString();
+    const [date, time] = dateTime.split("T");
 
     return(
         <div 
@@ -223,8 +224,8 @@ function Model({ points, activeIndexes, sensors }) {
             const p2 = points[activeIndexes[i]];
             const distance = Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
     
-            const t1 = new Date(p1.timestamp);
-            const t2 = new Date(p2.timestamp);
+            const t1 = new Date(p1.timestamp * 1000).toISOString();
+            const t2 = new Date(p2.timestamp * 1000).toISOString();
             const timeDiff = Math.abs((t2 - t1) / 1000);
     
             totalDistance += distance;
@@ -512,7 +513,7 @@ export function App() {
         
         fetch(url)
             .then((response) => response.json())
-            .then((data) => setPoints(data.locations))
+            .then((data) => setPoints(data.locationPoints))
             .catch((err) => console.error("Ошибка загрузки:", err));
     };
 
