@@ -84,7 +84,7 @@ body {
   border-radius: 3px;
   white-space: nowrap;
 }
-div.sensor-dot:nth-child(2) span {
+div.sensor-dot:nth-child(3) span {
   top: -1em;
   left: 4em;
 }

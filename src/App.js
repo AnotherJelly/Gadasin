@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 
 const settings = {
     api: {
-        url: "http://localhost:5000/api/location",
-        urlSensors: "http://localhost:5000/api/sensors",
-        urlSave: "http://localhost:5000/api/location/save-point",
+        url: "http://localhost:9000/api/location",
+        urlSensors: "http://localhost:9000/api/sensors",
+        urlSave: "http://localhost:9000/api/location/save-point",
         objectId: "1",
     },
     titleRadio: "Таблицы",
@@ -451,7 +451,7 @@ function DescModal({ closeModal, isModalOpen }) {
 
 export function App() {
     const [points, setPoints] = useState([]);
-    const [sensors, setSensors] = useState([]);
+    const [sensors, setSensors] = useState([{"x": 0, "y": 0}, {"x": 340, "y": 0}, {"x": 170, "y": 295}]);
     const [dateFrom, setDateFrom] = useState(null);
     const [dateTo, setDateTo] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
