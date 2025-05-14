@@ -4,6 +4,7 @@ const settings = {
     api: {
         url: "http://localhost:5000/api/location",
         urlSensors: "http://localhost:5000/api/sensors",
+        urlSave: "http://localhost:5000/api/location/save-point",
         objectId: "1",
     },
     titleRadio: "Таблицы",
@@ -15,11 +16,7 @@ const settings = {
         { id: "date_to", desc: "Дата до" }
     ],
     tablesDB: [
-        { id: "sensors", desc: "Таблицы БД", mode: () => onClick() },
-    ],
-    buttonsApi: [
-        { id: "points", desc: "Обновить точки" },
-        { id: "sensors1", desc: "Обновить датчики" },
+        { id: "sensors", desc: "Таблицы БД" },
     ],
 }
 
@@ -40,7 +37,7 @@ function MenuDateInput({ title, inputDate, onChange }) {
     );    
 }
 
-function MenuButtons({ title, onClick1, onClick2 }) {
+function MenuButtons({ title, onClick1, onClick2, onClick3 }) {
 
     return(
         <fieldset className="menu-fieldset">
@@ -51,6 +48,9 @@ function MenuButtons({ title, onClick1, onClick2 }) {
             </div>
             <div className="menu-db">
                 <button type="button" onClick={() => onClick2()}>Обновить датчики</button>
+            </div>
+            <div className="menu-db">
+                <button type="button" onClick={() => onClick3()}>Сохранить точку</button>
             </div>
 
         </fieldset>
@@ -73,7 +73,7 @@ function MenuDB({ title, buttons, onClick }) {
     );
 }
 
-function MenuFilter({ openModal, onInputDate, fetchData, fetchSensor }) {
+function MenuFilter({ openModal, onInputDate, fetchData, fetchSensor, savePoint }) {
 
     return(
         <>
@@ -91,6 +91,7 @@ function MenuFilter({ openModal, onInputDate, fetchData, fetchSensor }) {
                 title={settings.titlButtons}
                 onClick1={fetchData}
                 onClick2={fetchSensor}
+                onClick3={savePoint}
             />
         </>
     );    
@@ -133,7 +134,7 @@ function MenuList({ title, points, activeIndexes, toggleActive }) {
     ); 
 }
 
-function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleActive, openModal, onInputDate, fetchData, fetchSensor }) {
+function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleActive, openModal, onInputDate, fetchData, fetchSensor, savePoint }) {
     return (
         <div className={`sidebar ${isMenuOpen ? "open" : ""}`}>
             <button className={`burger ${isMenuOpen ? "active" : ""}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -145,6 +146,7 @@ function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleA
                     onInputDate={onInputDate}
                     fetchData={fetchData}
                     fetchSensor={fetchSensor}
+                    savePoint={savePoint}
                 />
                 <MenuList
                     title={settings.titleList}
@@ -471,6 +473,31 @@ export function App() {
             if (type === settings.inputDate[1].id) setDateTo(date);
         }
     };
+
+    const savePoint = () => {
+        const point = points[0];
+
+        if (!point || !point.id) {
+            console.error("ID не найден в points[0]");
+            return;
+        }
+
+        const url = `${settings.api.urlSave}?object_id=${settings.api.objectId}&id=${point.id}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Ошибка запроса: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Точка сохранена:", data);
+            })
+            .catch(error => {
+                console.error("Ошибка при сохранении точки:", error);
+            });
+    }
     
     const fetchData = () => {
         const now = new Date();
@@ -497,7 +524,6 @@ export function App() {
             .then((data) => setSensors(data))
             .catch((err) => console.error("Ошибка загрузки:", err));
 
-        console.log(sensors)
     };
   
     const openModal = () => {
@@ -528,6 +554,7 @@ export function App() {
                     onInputDate={onInputDate}
                     fetchData={fetchData}
                     fetchSensor={fetchSensor}
+                    savePoint={savePoint}
                 />
             </div>
         </div>
