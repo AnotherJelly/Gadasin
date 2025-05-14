@@ -224,8 +224,10 @@ function Model({ points, activeIndexes, sensors }) {
             const p2 = points[activeIndexes[i]];
             const distance = Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
     
-            const t1 = new Date(p1.timestamp * 1000).toISOString();
-            const t2 = new Date(p2.timestamp * 1000).toISOString();
+            const date1 = new Date(p1.timestamp * 1000);
+            const date2 = new Date(p2.timestamp * 1000);
+            const t1 = date1.toISOString();
+            const t2 = date2.toISOString();
             const timeDiff = Math.abs((t2 - t1) / 1000);
     
             totalDistance += distance;
