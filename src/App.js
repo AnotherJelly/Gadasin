@@ -407,19 +407,8 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
             });
 
             const data = await response.json();
-            if (
-                typeof data.sensors === 'object' &&
-                data.sensors !== null &&
-                Object.keys(data.sensors).length === 3 &&
-                Object.values(data.sensors).every(
-                    (sensor) =>
-                        typeof sensor === 'object' &&
-                        sensor !== null &&
-                        'x' in sensor &&
-                        'y' in sensor
-                )
-            ) {
-                setSensors(data.sensors);
+            if (true) {
+                setSensors(data);
                 setDistances({
                     distance_between_1_and_2: '',
                     distance_between_1_and_3: '',
