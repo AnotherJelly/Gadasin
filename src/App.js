@@ -407,9 +407,8 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
             });
 
             const data = await response.json();
-            /* 
-            
-                typeof data === 'object' &&
+
+            if (typeof data === 'object' &&
                 data !== null &&
                 Object.keys(data).length === 3 &&
                 Object.values(data).every(
@@ -418,10 +417,7 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
                         sensor !== null &&
                         'x' in sensor &&
                         'y' in sensor
-                )
-            
-            */
-            if (true) {
+            )) {
                 setSensors(data);
                 setDistances({
                     distance_between_1_and_2: '',
@@ -617,7 +613,13 @@ export function App() {
 
         const url = `${settings.api.urlSave}/${point.locationPointId}/save`;
 
-        fetch(url)
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(point)
+        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Ошибка запроса: ${response.status}`);
