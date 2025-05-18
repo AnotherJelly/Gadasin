@@ -624,10 +624,12 @@ export function App() {
                 if (!response.ok) {
                     throw new Error(`Ошибка запроса: ${response.status}`);
                 }
-                return response.json();
+
+                // Если тело не нужно, просто возвращаем успех
+                return;
             })
-            .then(data => {
-                console.log("Точка сохранена:", data);
+            .then(() => {
+                console.log("Точка сохранена");
             })
             .catch(error => {
                 console.error("Ошибка при сохранении точки:", error);
