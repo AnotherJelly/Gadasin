@@ -407,6 +407,20 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
             });
 
             const data = await response.json();
+            /* 
+            
+                typeof data === 'object' &&
+                data !== null &&
+                Object.keys(data).length === 3 &&
+                Object.values(data).every(
+                    (sensor) =>
+                        typeof sensor === 'object' &&
+                        sensor !== null &&
+                        'x' in sensor &&
+                        'y' in sensor
+                )
+            
+            */
             if (true) {
                 setSensors(data);
                 setDistances({
@@ -415,7 +429,7 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
                     distance_between_2_and_3: '',
                 });
             } else {
-                console.warn('Неверная структура sensors:', data.sensors);
+                console.warn('Неверная структура sensors:', data);
                 setError('Сервер вернул неожиданные данные');
             }
 
@@ -524,7 +538,7 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
                                         {points?.map((point, index) => (
                                             <tr key={index}>
                                                 <td>{index}</td>
-                                                <td>{point.id}</td>
+                                                <td>{point.locationPointId}</td>
                                                 <td>{point.x}</td>
                                                 <td>{point.y}</td>
                                                 <td>{point.timestamp}</td>
@@ -596,12 +610,12 @@ export function App() {
     const savePoint = () => {
         const point = points[0];
 
-        if (!point || !point.id) {
+        if (!point || !point.locationPointId) {
             console.error("ID не найден в points[0]");
             return;
         }
 
-        const url = `${settings.api.urlSave}/${point.id}/save`;
+        const url = `${settings.api.urlSave}/${point.locationPointId}/save`;
 
         fetch(url)
             .then(response => {
