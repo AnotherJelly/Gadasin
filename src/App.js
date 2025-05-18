@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Children } from "react";
 
 const settings = {
     api: {
         url: "http://localhost:9000/api/location",
-        urlSensors: "http://localhost:9000/api/sensors",
-        urlSave: "http://localhost:9000/api/location/save-point",
+        urlSensors: "http://localhost:9000/api/sensors/set-coordinates",
+        urlSave: "http://localhost:9000/api/location",
         objectId: "5f0f2e36-d1a6-4f1e-95a4-167f0e14e07c",
     },
     titleRadio: "Таблицы",
@@ -16,8 +16,10 @@ const settings = {
         { id: "date_to", desc: "Дата до" }
     ],
     tablesDB: [
-        { id: "sensors", desc: "Таблицы БД" },
+        { id: "sensors", desc: "Таблицы БД", modalType: "tables" },
+        { id: "sensorsSave", desc: "Обновить датчики", modalType: "sensors" },
     ],
+    units: "см"
 }
 
 function MenuDateInput({ title, inputDate, onChange }) {
@@ -37,7 +39,7 @@ function MenuDateInput({ title, inputDate, onChange }) {
     );    
 }
 
-function MenuButtons({ title, onClick1, onClick2, onClick3 }) {
+function MenuButtons({ title, onClick1, onClick2 }) {
 
     return(
         <fieldset className="menu-fieldset">
@@ -47,10 +49,7 @@ function MenuButtons({ title, onClick1, onClick2, onClick3 }) {
                 <button type="button" onClick={() => onClick1()}>Обновить точки</button>
             </div>
             <div className="menu-db">
-                <button type="button" onClick={() => onClick2()}>Обновить датчики</button>
-            </div>
-            <div className="menu-db">
-                <button type="button" onClick={() => onClick3()}>Сохранить точку</button>
+                <button type="button" onClick={() => onClick2()}>Сохранить точку</button>
             </div>
 
         </fieldset>
@@ -65,7 +64,7 @@ function MenuDB({ title, buttons, onClick }) {
 
             {buttons.map((mode) => (
                 <div key={mode.id} className="menu-db">
-                    <button type="button" onClick={() => onClick()}>{mode.desc}</button>
+                    <button type="button" onClick={() => onClick(mode.modalType)}>{mode.desc}</button>
                 </div>
             ))}
 
@@ -73,7 +72,7 @@ function MenuDB({ title, buttons, onClick }) {
     );
 }
 
-function MenuFilter({ openModal, onInputDate, fetchData, fetchSensor, savePoint }) {
+function MenuFilter({ openModal, onInputDate, fetchData, savePoint }) {
 
     return(
         <>
@@ -90,23 +89,22 @@ function MenuFilter({ openModal, onInputDate, fetchData, fetchSensor, savePoint 
             <MenuButtons
                 title={settings.titlButtons}
                 onClick1={fetchData}
-                onClick2={fetchSensor}
-                onClick3={savePoint}
+                onClick2={savePoint}
             />
         </>
     );    
 }
 
 function MenuElement({ index, point, active, onClick }) {
-    const dateTime = new Date(point?.timestamp * 1000).toISOString();
-    const [date, time] = dateTime.split("T");
+    const dateTime = new Date(point?.timestamp * 1000);
+    const [date, time] = dateTime?.toISOString().split("T");
 
     return(
         <div 
             className={`menu-list__element ${active ? "active" : ""}`} 
             onClick={onClick}
         >
-            <div>{index + 1}. {point.x} см, {point.y} см</div>
+            <div>{index + 1}. {point.x} {settings.units}, {point.y} {settings.units}</div>
             <div>Дата: {date}</div>
             <div>Время: {time.split(".")[0]}</div>
         </div>
@@ -135,7 +133,7 @@ function MenuList({ title, points, activeIndexes, toggleActive }) {
     ); 
 }
 
-function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleActive, openModal, onInputDate, fetchData, fetchSensor, savePoint }) {
+function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleActive, openModal, onInputDate, fetchData, savePoint }) {
     return (
         <div className={`sidebar ${isMenuOpen ? "open" : ""}`}>
             <button className={`burger ${isMenuOpen ? "active" : ""}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -146,7 +144,6 @@ function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleA
                     openModal={openModal}
                     onInputDate={onInputDate}
                     fetchData={fetchData}
-                    fetchSensor={fetchSensor}
                     savePoint={savePoint}
                 />
                 <MenuList
@@ -164,8 +161,10 @@ function Model({ points, activeIndexes, sensors }) {
 
     const [infoBox, setInfoBox] = useState(null);
 
-    const maxX = Math.max(...sensors.map(s => s.x));
-    const maxY = Math.max(...sensors.map(s => s.y));
+    const sensorList = Object.values(sensors);
+
+    const maxX = Math.max(...sensorList.map(s => s.x));
+    const maxY = Math.max(...sensorList.map(s => s.y));
 
     const renderRoute = () => {
         if (activeIndexes.length < 2) return null;
@@ -195,9 +194,9 @@ function Model({ points, activeIndexes, sensors }) {
     };
 
     const renderSensorLines = () => {
-        if (!sensors || sensors.length < 2) return null;
+        if (!sensorList || sensorList.length < 2) return null;
     
-        const scaledPoints = sensors.map(sensor => ({
+        const scaledPoints = sensorList.map(sensor => ({
             x: (sensor.x / maxX) * 100,
             y: (sensor.y / maxY) * 100
         }));
@@ -226,9 +225,7 @@ function Model({ points, activeIndexes, sensors }) {
     
             const date1 = new Date(p1.timestamp * 1000);
             const date2 = new Date(p2.timestamp * 1000);
-            const t1 = date1.toISOString();
-            const t2 = date2.toISOString();
-            const timeDiff = Math.abs((t2 - t1) / 1000);
+            const timeDiff = Math.abs(date2 - date1) / 1000;
     
             totalDistance += distance;
             totalTime += timeDiff;
@@ -245,10 +242,10 @@ function Model({ points, activeIndexes, sensors }) {
         <div className="main-content">
             <div className="model-block">
                 <div className="model-img">
-                    <p>Средняя скорость: {getAverageSpeed(points, activeIndexes).toFixed(2)} см/с</p>
+                    <p>Средняя скорость: {getAverageSpeed(points, activeIndexes).toFixed(2)} {settings.units}/с</p>
                     <div className="model-test">
                         <div className="model-test__block">
-                            {sensors.map((sensor, i) => {
+                            {sensorList.map((sensor, i) => {
                                 const left = (sensor.x / maxX) * 100;
                                 const top = (sensor.y / maxY) * 100;
 
@@ -276,7 +273,8 @@ function Model({ points, activeIndexes, sensors }) {
                                     if (infoBox?.index === index) {
                                         setInfoBox(null); // Скрыть, если уже открыт
                                     } else {
-                                        [date, time] = point?.timestamp.split("T");
+                                        const dateTime = new Date(point?.timestamp * 1000);
+                                        [date, time] = dateTime.toISOString().split("T");
                                         setInfoBox({
                                             index,
                                             date,
@@ -302,7 +300,7 @@ function Model({ points, activeIndexes, sensors }) {
                                                     left: `${left}%`,
                                                 }}
                                             >
-                                                <div>x: {point.x} см; y: {point.y} см</div>
+                                                <div>x: {point.x} {settings.units}; y: {point.y} {settings.units}</div>
                                                 <div>Дата: {infoBox.date}</div>
                                                 <div>Время: {infoBox.time.split(".")[0]}</div>
                                             </div>
@@ -321,9 +319,47 @@ function Model({ points, activeIndexes, sensors }) {
     );
 }
 
-function DescModal({ closeModal, isModalOpen }) {
+const SensorInput = ({ number1, number2, value, onChange }) => {
+  const inputId = `distance-${number1}${number2}`;
+
+  const handleChange = (e) => {
+    onChange(`distance_between_${number1}_and_${number2}`, e.target.value);
+  };
+
+  return (
+    <div className="sensor-block">
+      <div className="sensor-coords">
+        <div className="coord-field">
+          <label className="sensor-title" htmlFor={inputId}>
+            Расстояние между {number1} и {number2}
+          </label>
+          <input type="number" step="1" min="0" id={inputId} value={value} onChange={handleChange}/>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+function ModalTitle({ title, closeModal }) {
+    return (
+        <div className="modal-content__title">
+            <span>{title}</span>
+            <button onClick={closeModal}>
+                <i className="fas fa-times"></i>
+            </button>
+        </div>
+    );
+}
+
+function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
     const [activeTab, setActiveTab] = useState("sensor1");
     const [points, setPoints] = useState([]);
+    const [distances, setDistances] = useState({
+        distance_between_1_and_2: '',
+        distance_between_1_and_3: '',
+        distance_between_2_and_3: '',
+    });
+    const [error, setError] = useState(''); 
 
     const fetchDataPoints = () => {
         const now = new Date();
@@ -331,7 +367,7 @@ function DescModal({ closeModal, isModalOpen }) {
         let url = `${settings.api.url}?object_id=${settings.api.objectId}&from_time=${from_time.toISOString()}&to_time=${now.toISOString()}`;
         fetch(url)
             .then((response) => response.json())
-            .then((data) => setPoints(data.locations))
+            .then((data) => setPoints(data.locationPoints))
             .catch((err) => console.error("Ошибка загрузки:", err));
     };
 
@@ -344,109 +380,199 @@ function DescModal({ closeModal, isModalOpen }) {
         setActiveTab(tab);
     };
 
+    const handleSensorChange = (key, value) => {
+        setDistances((prev) => ({
+            ...prev,
+            [key]: value,
+        }));  
+    };
+
+    const handleSave = async () => {
+        const hasEmpty = Object.values(distances).some((v) => v === '');
+        if (hasEmpty) {
+            setError('Пожалуйста, заполните все поля.');
+            return;
+        }
+
+        setError('');
+
+        const url = `${settings.api.urlSensors}`;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(distances),
+            });
+
+            const data = await response.json();
+            if (
+                typeof data.sensors === 'object' &&
+                data.sensors !== null &&
+                Object.keys(data.sensors).length === 3 &&
+                Object.values(data.sensors).every(
+                    (sensor) =>
+                        typeof sensor === 'object' &&
+                        sensor !== null &&
+                        'x' in sensor &&
+                        'y' in sensor
+                )
+            ) {
+                setSensors(data.sensors);
+                setDistances({
+                    distance_between_1_and_2: '',
+                    distance_between_1_and_3: '',
+                    distance_between_2_and_3: '',
+                });
+            } else {
+                console.warn('Неверная структура sensors:', data.sensors);
+                setError('Сервер вернул неожиданные данные');
+            }
+
+            if (!response.ok) {
+                throw new Error('Ошибка при сохранении');
+            }
+
+            alert('Датчики успешно обновлены!');
+        } catch (err) {
+            console.error(err);
+            setError('Ошибка при отправке данных на сервер');
+        }
+    };
+
+    const renderView = () => {
+        switch (modalType) {
+            case 'tables':
+                return (
+                    <>
+                        <ModalTitle 
+                            closeModal={closeModal} 
+                            title={"Таблицы БД"}
+                        />
+
+                        <div className="modal-content__tabs">
+                            <button
+                                onClick={() => handleTabClick("sensor1")}
+                                className={activeTab === "sensor1" ? "active" : ""}
+                            >
+                                Свойства датчиков
+                            </button>
+                            <button
+                                onClick={() => tablePoints()}
+                                className={activeTab === "sensor2" ? "active" : ""}
+                            >
+                                История местоположений
+                            </button>
+                        </div>
+
+                        <div className="modal-content__table">
+                            {activeTab === "sensor1" && (
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>id</th>
+                                            <th>Название</th>
+                                            <th>Модель</th>
+                                            <th>Комплектация</th>
+                                            <th>Серийник</th>
+                                            <th>Mac-адрес</th>
+                                            <th>Дата эксплуатации</th>
+                                            <th>Списан</th>
+                                            <th>Гарантийная информация</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Датчик температуры</td>
+                                            <td>DT-100</td>
+                                            <td>Термодатчик + крепеж</td>
+                                            <td>SN123456</td>
+                                            <td>00:1A:2B:3C:4D:5E</td>
+                                            <td>2023-05-10</td>
+                                            <td>Нет</td>
+                                            <td>Гарантия до 2026-05-10</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Датчик влажности</td>
+                                            <td>DH-200</td>
+                                            <td>Датчик + модуль связи</td>
+                                            <td>SN654321</td>
+                                            <td>00:1B:3D:5F:7A:9C</td>
+                                            <td>2022-11-23</td>
+                                            <td>Нет</td>
+                                            <td>Гарантия до 2025-11-23</td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Датчик давления</td>
+                                            <td>DP-300</td>
+                                            <td>Датчик + интерфейсный кабель</td>
+                                            <td>SN789012</td>
+                                            <td>00:2C:4E:6F:8B:AD</td>
+                                            <td>2021-08-15</td>
+                                            <td>Да</td>
+                                            <td>Гарантия истекла</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            )}
+
+                            {activeTab === "sensor2" && (
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>№</th>
+                                            <th>id</th>
+                                            <th>x</th>
+                                            <th>y</th>
+                                            <th>Время</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {points?.map((point, index) => (
+                                            <tr key={index}>
+                                                <td>{index}</td>
+                                                <td>{point.id}</td>
+                                                <td>{point.x}</td>
+                                                <td>{point.y}</td>
+                                                <td>{point.timestamp}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                    </>
+                );
+            case 'sensors':
+                return (
+                    <>
+                        <ModalTitle 
+                            closeModal={closeModal} 
+                            title={"Введите датчики"}
+                        /> 
+                        <div className="sensors-container">
+                            <SensorInput number1={1} number2={2} value={distances.distance_between_1_and_2} onChange={handleSensorChange} />
+                            <SensorInput number1={1} number2={3} value={distances.distance_between_1_and_3} onChange={handleSensorChange} />
+                            <SensorInput number1={2} number2={3} value={distances.distance_between_2_and_3} onChange={handleSensorChange} />
+                        </div>
+                        {error && <div style={{ color: 'red' }}>{error}</div>}
+                        <button type="button" className="button-save" onClick={handleSave} >Сохранить</button>
+                    </>
+                );
+            default:
+                return <div>Не найдено</div>;
+        }
+    };
+
     return (
         <div className={`modal-overlay ${isModalOpen ? "open" : ""}`}>
             <div className="modal-background" onClick={closeModal}></div>
             <div className="modal-content">
-                <div className="modal-content__title">
-                    <span>Таблицы БД</span>
-                    <button onClick={closeModal}>
-                        <i className="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <div className="modal-content__tabs">
-                    <button
-                        onClick={() => handleTabClick("sensor1")}
-                        className={activeTab === "sensor1" ? "active" : ""}
-                    >
-                        Свойства датчиков
-                    </button>
-                    <button
-                        onClick={() => tablePoints()}
-                        className={activeTab === "sensor2" ? "active" : ""}
-                    >
-                        История местоположений
-                    </button>
-                </div>
-
-                <div className="modal-content__table">
-                    {activeTab === "sensor1" && (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>id</th>
-                                    <th>Название</th>
-                                    <th>Модель</th>
-                                    <th>Комплектация</th>
-                                    <th>Серийник</th>
-                                    <th>Mac-адрес</th>
-                                    <th>Дата эксплуатации</th>
-                                    <th>Списан</th>
-                                    <th>Гарантийная информация</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Датчик температуры</td>
-                                    <td>DT-100</td>
-                                    <td>Термодатчик + крепеж</td>
-                                    <td>SN123456</td>
-                                    <td>00:1A:2B:3C:4D:5E</td>
-                                    <td>2023-05-10</td>
-                                    <td>Нет</td>
-                                    <td>Гарантия до 2026-05-10</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Датчик влажности</td>
-                                    <td>DH-200</td>
-                                    <td>Датчик + модуль связи</td>
-                                    <td>SN654321</td>
-                                    <td>00:1B:3D:5F:7A:9C</td>
-                                    <td>2022-11-23</td>
-                                    <td>Нет</td>
-                                    <td>Гарантия до 2025-11-23</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Датчик давления</td>
-                                    <td>DP-300</td>
-                                    <td>Датчик + интерфейсный кабель</td>
-                                    <td>SN789012</td>
-                                    <td>00:2C:4E:6F:8B:AD</td>
-                                    <td>2021-08-15</td>
-                                    <td>Да</td>
-                                    <td>Гарантия истекла</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    )}
-
-                    {activeTab === "sensor2" && (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>id</th>
-                                    <th>x</th>
-                                    <th>y</th>
-                                    <th>Время</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {points?.map((point, index) => (
-                                    <tr key={index}>
-                                        <td>{index}</td>
-                                        <td>{point.x}</td>
-                                        <td>{point.y}</td>
-                                        <td>{point.timestamp}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
+                {renderView()}
             </div>
         </div>
     );
@@ -454,9 +580,10 @@ function DescModal({ closeModal, isModalOpen }) {
 
 export function App() {
     const [points, setPoints] = useState([]);
-    const [sensors, setSensors] = useState([{"x": 0, "y": 0}, {"x": 340, "y": 0}, {"x": 170, "y": 295}]);
+    const [sensors, setSensors] = useState({"sensor1": {"x": 0, "y": 0}, "sensor2": {"x": 340, "y": 0}, "sensor3": {"x": 170, "y": 295}});
     const [dateFrom, setDateFrom] = useState(null);
     const [dateTo, setDateTo] = useState(null);
+    const [modalType, setModalType] = useState();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [activeIndexes, setActiveIndexes] = useState([]);
@@ -485,7 +612,7 @@ export function App() {
             return;
         }
 
-        const url = `${settings.api.urlSave}?object_id=${settings.api.objectId}&id=${point.id}`;
+        const url = `${settings.api.urlSave}/${point.id}/save`;
 
         fetch(url)
             .then(response => {
@@ -510,7 +637,7 @@ export function App() {
         } else {
             const from_time = dateFrom || new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
             const to_time = dateTo || new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
-            url = `${settings.api.url}?object_id=${settings.api.objectId}&from_time=${from_time.toISOString()}&to_time=${to_time.toISOString()}`;
+            url = `${settings.api.url}?object_id=${settings.api.objectId}&from_time=${from_time.toISOString()}&to_time=${to_time.toISOString()}&limit=100`;
         }
         
         fetch(url)
@@ -518,18 +645,9 @@ export function App() {
             .then((data) => setPoints(data.locationPoints))
             .catch((err) => console.error("Ошибка загрузки:", err));
     };
-
-    const fetchSensor = () => {
-        let url = settings.api.urlSensors;
-        
-        fetch(url)
-            .then((response) => response.json())
-            .then((data) => setSensors(data))
-            .catch((err) => console.error("Ошибка загрузки:", err));
-
-    };
   
-    const openModal = () => {
+    const openModal = (modalType) => {
+        setModalType(modalType);
         setIsModalOpen(true);
     };
   
@@ -544,6 +662,8 @@ export function App() {
             <DescModal 
                 closeModal={() => setIsModalOpen(false)} 
                 isModalOpen={isModalOpen}
+                modalType={modalType}
+                setSensors={setSensors}
             />
             <div className={`container ${isMenuOpen ? "menu-open" : ""}`}>
                 <Model points={points} activeIndexes={activeIndexes} sensors={sensors} />
@@ -556,7 +676,6 @@ export function App() {
                     openModal={openModal}
                     onInputDate={onInputDate}
                     fetchData={fetchData}
-                    fetchSensor={fetchSensor}
                     savePoint={savePoint}
                 />
             </div>
