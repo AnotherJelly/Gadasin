@@ -2,9 +2,9 @@ import React, { useState, useEffect, Children } from "react";
 
 const settings = {
     api: {
-        url: "http://localhost:9000/api/location",
-        urlSensors: "http://localhost:9000/api/sensors/set-coordinates",
-        urlSave: "http://localhost:9000/api/location",
+        url: "http://66.151.33.22:9000/api/location",
+        urlSensors: "http://66.151.33.22:9000/api/sensors/set-coordinates",
+        urlSave: "http://66.151.33.22:9000/api/location",
         objectId: "5f0f2e36-d1a6-4f1e-95a4-167f0e14e07c",
     },
     titleRadio: "Таблицы",
@@ -260,7 +260,7 @@ function Model({ points, activeIndexes, sensors }) {
                                         }}
                                         title={`Датчик ${i + 1}`}
                                     >
-                                        <span>{sensor.x}; {sensor.y}</span>
+                                        <span>{Math.round(sensor.x)}; {Math.round(sensor.y)}</span>
                                     </div>
                                 );
                             })}
@@ -273,13 +273,16 @@ function Model({ points, activeIndexes, sensors }) {
                                     if (infoBox?.index === index) {
                                         setInfoBox(null); // Скрыть, если уже открыт
                                     } else {
-                                        const dateTime = new Date(point?.timestamp * 1000);
-                                        [date, time] = dateTime.toISOString().split("T");
-                                        setInfoBox({
-                                            index,
-                                            date,
-                                            time
-                                        });
+                                        if (point?.timestamp != null) {
+                                            const dateTime = new Date(point.timestamp * 1000);
+                                            const [date, timeFull] = dateTime.toISOString().split("T");
+                                            const time = timeFull.split(".")[0]; // убираем миллисекунды
+                                            setInfoBox({
+                                                index,
+                                                date,
+                                                time
+                                            });
+                                        }
                                     }
                                 };
 
@@ -625,11 +628,11 @@ export function App() {
                     throw new Error(`Ошибка запроса: ${response.status}`);
                 }
 
-                // Если тело не нужно, просто возвращаем успех
                 return;
             })
             .then(() => {
                 console.log("Точка сохранена");
+                alert("Точка сохранена");
             })
             .catch(error => {
                 console.error("Ошибка при сохранении точки:", error);

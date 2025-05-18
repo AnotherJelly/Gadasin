@@ -63,7 +63,7 @@ body {
   border-radius: 4px;
   font-size: 16px;
   white-space: nowrap;
-  z-index: 10;
+  z-index: 5;
 }
 .sensor-dot {
   width: 10px;
