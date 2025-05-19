@@ -2,6 +2,7 @@
   --main-color-black: #0D0D0D;
   --main-color-white: #FFFFFF;
   --btn-color-gray: #D6D7DB;
+  --btn-color-red: #d30000;
 }
 * {
   box-sizing: border-box;
@@ -27,15 +28,14 @@ body {
   transition: .3s;
   padding: 20px;
 }
-.model-block {
+.model-block, .model-img {
   width: 100%;
   height: 100%;
   position: relative;
 }
 .model-img {
-  position: relative;
-  height: 100%;
-  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 .model-img img {
   width: 100%;
@@ -48,6 +48,20 @@ body {
   left: 15.8%;
   width: 57.1%;
   height: 69.7%;
+}
+.model-img .button-delete {
+  height: fit-content;
+  text-align: center;
+  background: var(--btn-color-red);
+  color: var(--main-color-white);
+  border: 1px solid var(--btn-color-gray);
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 5px 25px;
+  transition: all .3s;
+}
+.model-img .button-delete:hover {
+  opacity: .8;
 }
 .model-test__block {
   position: relative;

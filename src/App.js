@@ -5,6 +5,7 @@ const settings = {
         url: "http://66.151.33.22:9000/api/location",
         urlSensors: "http://66.151.33.22:9000/api/sensors/set-coordinates",
         urlSave: "http://66.151.33.22:9000/api/location",
+        urlDelete: "http://66.151.33.22:9000/api/location/reset-saved",
         objectId: "5f0f2e36-d1a6-4f1e-95a4-167f0e14e07c",
     },
     titleRadio: "Таблицы",
@@ -96,7 +97,9 @@ function MenuFilter({ openModal, onInputDate, fetchData, savePoint }) {
 }
 
 function MenuElement({ index, point, active, onClick }) {
-    const dateTime = new Date(point?.timestamp * 1000);
+    const dateTime = new Date(point?.timestamp * 1000 - new Date().getTimezoneOffset() * 60000);
+    // const fixDate = dateTime + new Date().getTimezoneOffset() * 60000;
+    // alert (fixDate, 'here')
     const [date, time] = dateTime?.toISOString().split("T");
 
     return(
@@ -157,7 +160,43 @@ function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleA
     );
 }
 
-function Model({ points, activeIndexes, sensors }) {
+function BtnDelete ({ setPoints, setActiveIndexes }) {
+
+    const deletePoints = () => {
+
+        const url = `${settings.api.urlDelete}`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: ""
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Ошибка запроса: ${response.status}`);
+                }
+
+                return;
+            })
+            .then(() => {
+                console.log("Точки удалены");
+                setActiveIndexes([])
+                setPoints([]);
+                alert("Точки удалены");
+            })
+            .catch(error => {
+                console.error("Ошибка при сохранении точки:", error);
+            });
+    }
+
+    return (
+        <button type="button" className="button-delete" onClick={deletePoints}>Удалить точки</button>
+    );
+}
+
+function Model({ points, activeIndexes, sensors, setPoints, setActiveIndexes }) {
 
     const [infoBox, setInfoBox] = useState(null);
 
@@ -243,6 +282,10 @@ function Model({ points, activeIndexes, sensors }) {
             <div className="model-block">
                 <div className="model-img">
                     <p>Средняя скорость: {getAverageSpeed(points, activeIndexes).toFixed(2)} {settings.units}/с</p>
+                    <BtnDelete 
+                        setPoints={setPoints}
+                        setActiveIndexes={setActiveIndexes}
+                    />
                     <div className="model-test">
                         <div className="model-test__block">
                             {sensorList.map((sensor, i) => {
@@ -477,46 +520,42 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
                                             <th>Название</th>
                                             <th>Модель</th>
                                             <th>Комплектация</th>
-                                            <th>Серийник</th>
-                                            <th>Mac-адрес</th>
+                                            <th>Серийный номер</th>
                                             <th>Дата эксплуатации</th>
                                             <th>Списан</th>
-                                            <th>Гарантийная информация</th>
+                                            <th>Вывод из эксплуатации</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td>1</td>
-                                            <td>Датчик температуры</td>
-                                            <td>DT-100</td>
-                                            <td>Термодатчик + крепеж</td>
-                                            <td>SN123456</td>
-                                            <td>00:1A:2B:3C:4D:5E</td>
-                                            <td>2023-05-10</td>
+                                            <td>Ультразвуковой приемопередатчик</td>
+                                            <td>HC-SR04</td>
+                                            <td>Датчик</td>
+                                            <td>SN427845</td>
+                                            <td>23.05.2025</td>
                                             <td>Нет</td>
-                                            <td>Гарантия до 2026-05-10</td>
+                                            <td>23.05.2027</td>
                                         </tr>
                                         <tr>
                                             <td>2</td>
-                                            <td>Датчик влажности</td>
-                                            <td>DH-200</td>
-                                            <td>Датчик + модуль связи</td>
-                                            <td>SN654321</td>
-                                            <td>00:1B:3D:5F:7A:9C</td>
-                                            <td>2022-11-23</td>
+                                            <td>Ультразвуковой приемопередатчик</td>
+                                            <td>HC-SR04</td>
+                                            <td>Датчик</td>
+                                            <td>SN428954</td>
+                                            <td>23.05.2025</td>
                                             <td>Нет</td>
-                                            <td>Гарантия до 2025-11-23</td>
+                                            <td>23.05.2027</td>
                                         </tr>
                                         <tr>
                                             <td>3</td>
-                                            <td>Датчик давления</td>
-                                            <td>DP-300</td>
-                                            <td>Датчик + интерфейсный кабель</td>
-                                            <td>SN789012</td>
-                                            <td>00:2C:4E:6F:8B:AD</td>
-                                            <td>2021-08-15</td>
-                                            <td>Да</td>
-                                            <td>Гарантия истекла</td>
+                                            <td>Ультразвуковой приемопередатчик</td>
+                                            <td>HC-SR04</td>
+                                            <td>Датчик</td>
+                                            <td>SN150392</td>
+                                            <td>23.05.2025</td>
+                                            <td>Нет</td>
+                                            <td>23.05.2027</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -594,7 +633,7 @@ export function App() {
         const date = new Date(value);
         setActiveIndexes([]);
         // Корректировка временной зоны
-        date.setHours(date.getHours() + 3);
+        //date.setHours(date.getHours() + 3);
     
         if (isNaN(date.getTime())) {
             console.warn("Invalid date input");
@@ -676,7 +715,13 @@ export function App() {
                 setSensors={setSensors}
             />
             <div className={`container ${isMenuOpen ? "menu-open" : ""}`}>
-                <Model points={points} activeIndexes={activeIndexes} sensors={sensors} />
+                <Model 
+                    points={points} 
+                    activeIndexes={activeIndexes} 
+                    sensors={sensors} 
+                    setPoints={setPoints}
+                    setActiveIndexes={setActiveIndexes}
+                />
                 <SidebarMenu
                     isMenuOpen={isMenuOpen}
                     setIsMenuOpen={setIsMenuOpen}
