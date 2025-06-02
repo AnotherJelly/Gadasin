@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Children } from "react";
+import React, { useState, useMemo } from "react";
 
 const settings = {
     api: {
@@ -10,15 +10,12 @@ const settings = {
     },
     titleRadio: "Таблицы",
     titleInput: "Фильтр даты",
-    titleList: "Точки",
-    titlButtons: "Обновление данных",
+    titleList: "Измерения",
+    titleButtons: "Обновление данных",
+    titleExperiment: "Эксперимент",
     inputDate: [
         { id: "date_from", desc: "Дата от" },
         { id: "date_to", desc: "Дата до" }
-    ],
-    tablesDB: [
-        { id: "sensors", desc: "Таблицы БД", modalType: "tables" },
-        { id: "sensorsSave", desc: "Обновить датчики", modalType: "sensors" },
     ],
     units: "см"
 }
@@ -26,61 +23,57 @@ const settings = {
 function MenuDateInput({ title, inputDate, onChange }) {
 
     return(
-        <fieldset className="menu-fieldset">
-            <legend>{title}</legend>
+        <div>
+            {/*
+            <fieldset className="menu-fieldset">
+                <legend>{title}</legend>
 
-            {inputDate.map((date) => (
-                <div key={date.id} className="menu-input">
-                    <label htmlFor={date.id}>{date.desc}</label>
-                    <input type="datetime-local" step="1" id={date.id} onChange={(e) => onChange(date.id, e.target.value)}/>
-                </div>
-            ))}
-
-        </fieldset>
+                {inputDate.map((date) => (
+                    <div key={date.id} className="menu-input">
+                        <label htmlFor={date.id}>{date.desc}</label>
+                        <input type="datetime-local" step="1" id={date.id} onChange={(e) => onChange(date.id, e.target.value)}/>
+                    </div>
+                ))}
+            </fieldset>
+            */}
+        </div>
     );    
 }
 
-function MenuButtons({ title, onClick1, onClick2 }) {
+function MenuButtons({ title, buttons, isExperimentEnded }) {
+
+    const allowedButtons = useMemo(() => ["Таблицы БД", "Новый эксперимент"], []);
 
     return(
         <fieldset className="menu-fieldset">
             <legend>{title}</legend>
 
-            <div className="menu-db">
-                <button type="button" onClick={() => onClick1()}>Обновить точки</button>
-            </div>
-            <div className="menu-db">
-                <button type="button" onClick={() => onClick2()}>Сохранить точку</button>
-            </div>
+            {buttons.map((btn, index) => {
+                const isDisabled = isExperimentEnded && !allowedButtons.includes(btn.title);
+                return (
+                    <div className="menu-db" key={index}>
+                        <button type="button" onClick={btn.onClick} disabled={isDisabled}>
+                            {btn.title}
+                        </button>
+                    </div>
+                );
+            })}
 
         </fieldset>
     );
 }
 
-function MenuDB({ title, buttons, onClick }) {
+function MenuFilter({ openModal, onInputDate, fetchData, savePoint, deletePoints, buildRoad, isExperimentEnded }) {
 
     return(
-        <fieldset className="menu-fieldset">
-            <legend>{title}</legend>
-
-            {buttons.map((mode) => (
-                <div key={mode.id} className="menu-db">
-                    <button type="button" onClick={() => onClick(mode.modalType)}>{mode.desc}</button>
-                </div>
-            ))}
-
-        </fieldset>
-    );
-}
-
-function MenuFilter({ openModal, onInputDate, fetchData, savePoint }) {
-
-    return(
-        <>
-            <MenuDB
+        <div>
+            <MenuButtons
                 title={settings.titleRadio}
-                buttons={settings.tablesDB}
-                onClick={openModal}
+                buttons={[
+                    { title: "Таблицы БД", onClick: () => openModal("tables") },
+                    { title: "Обновить датчики", onClick: () => openModal("sensors")},
+                ]}
+                isExperimentEnded={isExperimentEnded}
             />
             <MenuDateInput
                 title={settings.titleInput}
@@ -88,18 +81,27 @@ function MenuFilter({ openModal, onInputDate, fetchData, savePoint }) {
                 onChange={onInputDate}
             />
             <MenuButtons
-                title={settings.titlButtons}
-                onClick1={fetchData}
-                onClick2={savePoint}
+                title={settings.titleButtons}
+                buttons={[
+                    { title: "Провести измерение", onClick: fetchData }, 
+                    { title: "Сохранить измерение", onClick: savePoint }
+                ]}
+                isExperimentEnded={isExperimentEnded}
             />
-        </>
+            <MenuButtons
+                title={settings.titleExperiment}
+                buttons={[
+                    { title: "Новый эксперимент", onClick: deletePoints }, 
+                    { title: "Завершить эксперимент", onClick: buildRoad }
+                ]}
+                isExperimentEnded={isExperimentEnded}
+            />
+        </div>
     );    
 }
 
 function MenuElement({ index, point, active, onClick }) {
     const dateTime = new Date(point?.timestamp * 1000 - new Date().getTimezoneOffset() * 60000);
-    // const fixDate = dateTime + new Date().getTimezoneOffset() * 60000;
-    // alert (fixDate, 'here')
     const [date, time] = dateTime?.toISOString().split("T");
 
     return(
@@ -114,89 +116,64 @@ function MenuElement({ index, point, active, onClick }) {
     ); 
 }
 
-function MenuList({ title, points, activeIndexes, toggleActive }) {
+function MenuList({ title, points, activeIndexes, toggleActive, haveSaved }) {
 
     return(
         <fieldset className="menu-fieldset menu-fieldset__points">
             <legend>{title}</legend>
             <div className="menu-list">
                 {(points?.length === 0) ? 
-                    <div>Точки отсутствуют</div> :
+                    <div>Измерения отсутствуют</div> :
                     points?.map((point, index) => (
-                        <MenuElement 
-                            key={index}
-                            index={index}
-                            point={point} 
-                            active={activeIndexes.includes(index)} 
-                            onClick={() => toggleActive(index)}
-                        />
+                        <React.Fragment key={index}>
+                            <MenuElement 
+                                index={index}
+                                point={point} 
+                                active={activeIndexes.includes(index)} 
+                                onClick={() => toggleActive(index)}
+                            />
+                            {index === 0 && haveSaved && (
+                                <div>Сохранённые Измерения</div>
+                            )}
+                        </React.Fragment>
                     ))}
             </div>
         </fieldset>
     ); 
 }
 
-function SidebarMenu({ isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleActive, openModal, onInputDate, fetchData, savePoint }) {
+function SidebarMenu({ 
+    isMenuOpen, setIsMenuOpen, points, activeIndexes, toggleActive, openModal, onInputDate,
+    fetchData, savePoint, deletePoints, buildRoad, haveSaved, isExperimentEnded
+}) {
     return (
         <div className={`sidebar ${isMenuOpen ? "open" : ""}`}>
             <button className={`burger ${isMenuOpen ? "active" : ""}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
                 <i></i>
             </button>
             <div className="menu-content">
+                <MenuList
+                    title={settings.titleList}
+                    points={points}
+                    activeIndexes={activeIndexes} 
+                    toggleActive={toggleActive}
+                    haveSaved={haveSaved}
+                />
                 <MenuFilter 
                     openModal={openModal}
                     onInputDate={onInputDate}
                     fetchData={fetchData}
                     savePoint={savePoint}
-                />
-                <MenuList
-                    title={settings.titleList}
-                    points={points} 
-                    activeIndexes={activeIndexes} 
-                    toggleActive={toggleActive}
+                    deletePoints={deletePoints}
+                    buildRoad={buildRoad}
+                    isExperimentEnded={isExperimentEnded}
                 />
             </div>
         </div>
     );
 }
 
-function BtnDelete ({ setPoints, setActiveIndexes }) {
-
-    const deletePoints = () => {
-
-        const url = `${settings.api.urlDelete}`;
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: ""
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Ошибка запроса: ${response.status}`);
-                }
-
-                return;
-            })
-            .then(() => {
-                console.log("Точки удалены");
-                setActiveIndexes([])
-                setPoints([]);
-                alert("Точки удалены");
-            })
-            .catch(error => {
-                console.error("Ошибка при сохранении точки:", error);
-            });
-    }
-
-    return (
-        <button type="button" className="button-delete" onClick={deletePoints}>Удалить точки</button>
-    );
-}
-
-function Model({ points, activeIndexes, sensors, setPoints, setActiveIndexes }) {
+function Model({ points, activeIndexes, sensors }) {
 
     const [infoBox, setInfoBox] = useState(null);
 
@@ -252,14 +229,16 @@ function Model({ points, activeIndexes, sensors, setPoints, setActiveIndexes }) 
     };
 
     function getAverageSpeed(points, activeIndexes) {
-        if (!activeIndexes || activeIndexes.length < 2) return 0;
+        if (!activeIndexes || activeIndexes.length < 2) return [0,0];
+
+        const sortedIndexes = [...activeIndexes].sort((a, b) => a - b);
     
         let totalDistance = 0;
         let totalTime = 0;
     
-        for (let i = 1; i < activeIndexes.length; i++) {
-            const p1 = points[activeIndexes[i - 1]];
-            const p2 = points[activeIndexes[i]];
+        for (let i = 1; i < sortedIndexes.length; i++) {
+            const p1 = points[sortedIndexes[i - 1]];
+            const p2 = points[sortedIndexes[i]];
             const distance = Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
     
             const date1 = new Date(p1.timestamp * 1000);
@@ -270,22 +249,22 @@ function Model({ points, activeIndexes, sensors, setPoints, setActiveIndexes }) 
             totalTime += timeDiff;
         }
     
-        if (totalTime === 0) return 0;
+        if (totalTime === 0) return [totalDistance, 0];
 
         console.log(`${totalDistance} / ${totalTime}`);
     
-        return totalDistance / totalTime;
+        return [totalDistance, totalDistance / totalTime];
     }
+    const [distance, speed] = getAverageSpeed(points, activeIndexes);
 
     return (
         <div className="main-content">
             <div className="model-block">
                 <div className="model-img">
-                    <p>Средняя скорость: {getAverageSpeed(points, activeIndexes).toFixed(2)} {settings.units}/с</p>
-                    <BtnDelete 
-                        setPoints={setPoints}
-                        setActiveIndexes={setActiveIndexes}
-                    />
+                    <div>
+                        <p>Расстояние: {distance.toFixed(2)} {settings.units}</p>
+                        <p>Средняя скорость: {speed.toFixed(2)} {settings.units}/с</p>
+                    </div>
                     <div className="model-test">
                         <div className="model-test__block">
                             {sensorList.map((sensor, i) => {
@@ -304,6 +283,7 @@ function Model({ points, activeIndexes, sensors, setPoints, setActiveIndexes }) 
                                         title={`Датчик ${i + 1}`}
                                     >
                                         <span>{Math.round(sensor.x)}; {Math.round(sensor.y)}</span>
+                                        <div>{`${i + 1}`}</div>
                                     </div>
                                 );
                             })}
@@ -357,10 +337,22 @@ function Model({ points, activeIndexes, sensors, setPoints, setActiveIndexes }) 
                             }
                             {renderRoute()}
                             {renderSensorLines()}
+                            <div className="model-coordinate model-coordinate__x"></div>
+                            <div className="model-coordinate model-coordinate__y"></div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function Loading ({ isLoading }) {
+    if (!isLoading) return null;
+
+    return (
+        <div className="overlay">
+            <div className="spinner"></div>
         </div>
     );
 }
@@ -377,7 +369,7 @@ const SensorInput = ({ number1, number2, value, onChange }) => {
       <div className="sensor-coords">
         <div className="coord-field">
           <label className="sensor-title" htmlFor={inputId}>
-            Расстояние между {number1} и {number2}
+            Расстояние между {number1} и {number2} в см
           </label>
           <input type="number" step="1" min="0" id={inputId} value={value} onChange={handleChange}/>
         </div>
@@ -397,24 +389,34 @@ function ModalTitle({ title, closeModal }) {
     );
 }
 
-function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
+function DescModal({ closeModal, isModalOpen, modalType, setSensors, setIsLoading }) {
     const [activeTab, setActiveTab] = useState("sensor1");
     const [points, setPoints] = useState([]);
-    const [distances, setDistances] = useState({
-        distance_between_1_and_2: '',
-        distance_between_1_and_3: '',
-        distance_between_2_and_3: '',
+    const [distances, setDistances] = useState(() => {
+        const distances = localStorage.getItem('distances');
+        return distances
+            ? JSON.parse(distances)
+            : {
+                distance_between_1_and_2: '170',
+                distance_between_1_and_3: '170',
+                distance_between_2_and_3: '170',
+            };
     });
     const [error, setError] = useState(''); 
 
     const fetchDataPoints = () => {
+        setIsLoading(true)
         const now = new Date();
         const from_time = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
         let url = `${settings.api.url}?object_id=${settings.api.objectId}&from_time=${from_time.toISOString()}&to_time=${now.toISOString()}`;
         fetch(url)
             .then((response) => response.json())
             .then((data) => setPoints(data.locationPoints))
-            .catch((err) => console.error("Ошибка загрузки:", err));
+            .catch((err) => {
+                alert("Ошибка загрузки: " + err.message);
+                console.error("Ошибка загрузки:", err)
+            })
+            .finally(() => setIsLoading(false));
     };
 
     const tablePoints = () => {
@@ -441,9 +443,9 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
         }
 
         setError('');
-
         const url = `${settings.api.urlSensors}`;
         try {
+            setIsLoading(true);
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -451,6 +453,10 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
                 },
                 body: JSON.stringify(distances),
             });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при сохранении: ' + response.status);
+            }
 
             const data = await response.json();
 
@@ -464,25 +470,20 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
                         'x' in sensor &&
                         'y' in sensor
             )) {
+                localStorage.setItem('distances', JSON.stringify(distances));
+                localStorage.setItem('locationSensor', JSON.stringify(data));
                 setSensors(data);
-                setDistances({
-                    distance_between_1_and_2: '',
-                    distance_between_1_and_3: '',
-                    distance_between_2_and_3: '',
-                });
+                alert('Датчики успешно обновлены!');
             } else {
                 console.warn('Неверная структура sensors:', data);
                 setError('Сервер вернул неожиданные данные');
             }
-
-            if (!response.ok) {
-                throw new Error('Ошибка при сохранении');
-            }
-
-            alert('Датчики успешно обновлены!');
         } catch (err) {
             console.error(err);
+            alert('Ошибка: ' + err.message);
             setError('Ошибка при отправке данных на сервер');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -533,9 +534,9 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
                                             <td>HC-SR04</td>
                                             <td>Датчик</td>
                                             <td>SN427845</td>
-                                            <td>23.05.2025</td>
+                                            <td>20.05.2025</td>
                                             <td>Нет</td>
-                                            <td>23.05.2027</td>
+                                            <td>20.05.2027</td>
                                         </tr>
                                         <tr>
                                             <td>2</td>
@@ -543,9 +544,9 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
                                             <td>HC-SR04</td>
                                             <td>Датчик</td>
                                             <td>SN428954</td>
-                                            <td>23.05.2025</td>
+                                            <td>20.05.2025</td>
                                             <td>Нет</td>
-                                            <td>23.05.2027</td>
+                                            <td>20.05.2027</td>
                                         </tr>
                                         <tr>
                                             <td>3</td>
@@ -553,9 +554,9 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
                                             <td>HC-SR04</td>
                                             <td>Датчик</td>
                                             <td>SN150392</td>
-                                            <td>23.05.2025</td>
+                                            <td>20.05.2025</td>
                                             <td>Нет</td>
-                                            <td>23.05.2027</td>
+                                            <td>20.05.2027</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -597,8 +598,8 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
                         /> 
                         <div className="sensors-container">
                             <SensorInput number1={1} number2={2} value={distances.distance_between_1_and_2} onChange={handleSensorChange} />
-                            <SensorInput number1={1} number2={3} value={distances.distance_between_1_and_3} onChange={handleSensorChange} />
                             <SensorInput number1={2} number2={3} value={distances.distance_between_2_and_3} onChange={handleSensorChange} />
+                            <SensorInput number1={1} number2={3} value={distances.distance_between_1_and_3} onChange={handleSensorChange} />
                         </div>
                         {error && <div style={{ color: 'red' }}>{error}</div>}
                         <button type="button" className="button-save" onClick={handleSave} >Сохранить</button>
@@ -621,19 +622,25 @@ function DescModal({ closeModal, isModalOpen, modalType, setSensors }) {
 
 export function App() {
     const [points, setPoints] = useState([]);
-    const [sensors, setSensors] = useState({"sensor1": {"x": 0, "y": 0}, "sensor2": {"x": 340, "y": 0}, "sensor3": {"x": 170, "y": 295}});
+    const [sensors, setSensors] = useState(() => {
+        const locationSensor = localStorage.getItem('locationSensor');
+        return locationSensor
+            ? JSON.parse(locationSensor)
+            : {"sensor1": {"x": 0, "y": 0}, "sensor2": {"x": 170, "y": 0}, "sensor3": {"x": 85, "y": 147}};
+    });
     const [dateFrom, setDateFrom] = useState(null);
     const [dateTo, setDateTo] = useState(null);
     const [modalType, setModalType] = useState();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [activeIndexes, setActiveIndexes] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [haveSaved, setHaveSaved] = useState(false);
+    const [isExperimentEnded, setIsExperimentEnded] = useState(false);
 
     const onInputDate = (type, value) => {
         const date = new Date(value);
         setActiveIndexes([]);
-        // Корректировка временной зоны
-        //date.setHours(date.getHours() + 3);
     
         if (isNaN(date.getTime())) {
             console.warn("Invalid date input");
@@ -645,14 +652,16 @@ export function App() {
         }
     };
 
-    const savePoint = () => {
+    /* Кнопка "Сохранить измерение" */
+    const savePoint = async () => {
         const point = points[0];
 
         if (!point || !point.locationPointId) {
             console.error("ID не найден в points[0]");
+            alert("ID не найден в points[0]");
             return;
         }
-
+        setIsLoading(true);
         const url = `${settings.api.urlSave}/${point.locationPointId}/save`;
 
         fetch(url, {
@@ -670,29 +679,136 @@ export function App() {
                 return;
             })
             .then(() => {
-                console.log("Точка сохранена");
-                alert("Точка сохранена");
+                console.log("Измерение сохранено");
+                alert("Измерение сохранено");
             })
             .catch(error => {
-                console.error("Ошибка при сохранении точки:", error);
+                console.error("Ошибка при сохранении измерения:", error);
+                alert("Ошибка при сохранении измерения: " + err.message);
+            })
+            .finally(() => setIsLoading(false));
+    }
+
+    /* Кнопка "Новый эксперимент" */
+    const deletePoints = async () => {
+        const url = `${settings.api.urlDelete}`;
+
+        try {
+            setIsLoading(true);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: "",
             });
+
+            if (!response.ok) {
+                throw new Error(`Ошибка запроса: ${response.status}`);
+            }
+
+            console.log("Измерения удалены");
+            setActiveIndexes([]);
+            setPoints([]);
+            setIsExperimentEnded(false);
+            alert("Измерения удалены");
+        } catch (error) {
+            console.error("Ошибка при удалении точек:", error);
+            alert("Ошибка при удалении точек: " + error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const buildRoad = () => {
+        if (!window.confirm("Вы уверены?")) {
+            return;
+        }
+
+        setActiveIndexes([]);
+        setPoints([]);
+        setIsLoading(true);
+
+        const now = new Date();
+        const from_time = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+        const to_time = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+        url = `${settings.api.url}?object_id=${settings.api.objectId}&from_time=${from_time.toISOString()}&to_time=${to_time.toISOString()}&limit=100`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                setPoints(data.locationPoints);
+                setHaveSaved(false);
+                setActiveIndexes(Array.from({ length: data.locationPoints.length }, (_, i) => i));
+                setIsExperimentEnded(true);
+            })
+            .catch(err => {
+                console.error("Ошибка загрузки:", err);
+                alert("Ошибка загрузки: " + err.message);
+            })
+            .finally(() => setIsLoading(false));
     }
     
-    const fetchData = () => {
+    /* Кнопка "Провести измерение" */
+    const fetchData = async () => {
+        setActiveIndexes([]);
+        setPoints([]);
+        setIsLoading(true);
+
         const now = new Date();
         let url = "";
+        const from_time = dateFrom || new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+        const to_time = dateTo || new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+
+        url = `${settings.api.url}?object_id=${settings.api.objectId}&from_time=${from_time.toISOString()}&to_time=${to_time.toISOString()}&limit=100`;
+
+        // если обе даты null - два запроса
         if (dateFrom === null && dateTo === null) {
-            url = `${settings.api.url}?object_id=${settings.api.objectId}`;
+            const urlSaved = `${settings.api.url}?object_id=${settings.api.objectId}&from_time=${from_time.toISOString()}&to_time=${to_time.toISOString()}&limit=100`;
+
+            Promise.all([
+                fetch(urlSaved)
+                    .then(res => res.ok ? res.json() : { locationPoints: [] })
+                    .catch(() => ({ locationPoints: [] })),
+                fetch(`${settings.api.url}?object_id=${settings.api.objectId}`)
+                    .then(res => res.ok ? res.json() : { locationPoints: [] })
+                    .catch(() => ({ locationPoints: [] })),
+            ])
+                .then(([savedData, rawData]) => {
+                    const combined = [...rawData.locationPoints, ...savedData.locationPoints];
+                    setPoints(combined);
+                    setHaveSaved(savedData.locationPoints.length > 0);
+                })
+                .catch(err => {
+                    console.error("Ошибка загрузки:", err);
+                    alert("Ошибка загрузки: " + err.message);
+                })
+                .finally(() => setIsLoading(false));
+
         } else {
-            const from_time = dateFrom || new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-            const to_time = dateTo || new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
-            url = `${settings.api.url}?object_id=${settings.api.objectId}&from_time=${from_time.toISOString()}&to_time=${to_time.toISOString()}&limit=100`;
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    setPoints(data.locationPoints);
+                    setHaveSaved(false);
+                })
+                .catch(err => {
+                    console.error("Ошибка загрузки:", err);
+                    alert("Ошибка загрузки: " + err.message);
+                })
+                .finally(() => setIsLoading(false));
         }
-        
-        fetch(url)
-            .then((response) => response.json())
-            .then((data) => setPoints(data.locationPoints))
-            .catch((err) => console.error("Ошибка загрузки:", err));
     };
   
     const openModal = (modalType) => {
@@ -701,26 +817,29 @@ export function App() {
     };
   
     const toggleActive = (index) => {
-        setActiveIndexes((prev) =>
-            prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
-        );
+        setActiveIndexes((prev) => {
+            const updated = prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index];
+            return updated;
+        });
     };
   
     return (
         <div className="App">
+            <Loading 
+                isLoading={isLoading}
+            />
             <DescModal 
                 closeModal={() => setIsModalOpen(false)} 
                 isModalOpen={isModalOpen}
                 modalType={modalType}
                 setSensors={setSensors}
+                setIsLoading={setIsLoading}
             />
             <div className={`container ${isMenuOpen ? "menu-open" : ""}`}>
                 <Model 
                     points={points} 
                     activeIndexes={activeIndexes} 
-                    sensors={sensors} 
-                    setPoints={setPoints}
-                    setActiveIndexes={setActiveIndexes}
+                    sensors={sensors}
                 />
                 <SidebarMenu
                     isMenuOpen={isMenuOpen}
@@ -732,6 +851,10 @@ export function App() {
                     onInputDate={onInputDate}
                     fetchData={fetchData}
                     savePoint={savePoint}
+                    deletePoints={deletePoints}
+                    buildRoad={buildRoad}
+                    haveSaved={haveSaved}
+                    isExperimentEnded={isExperimentEnded}
                 />
             </div>
         </div>

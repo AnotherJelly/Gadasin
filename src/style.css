@@ -86,10 +86,11 @@ body {
   border-radius: 50%;
   border: 1px solid white;
   transform: translate(-50%, -50%);
+  z-index: 2;
 }
 .sensor-dot span {
   position: absolute;
-  top: -2em;
+  top: -3em;
   left: 50%;
   transform: translateX(-50%);
   font-size: 16px;
@@ -102,6 +103,17 @@ div.sensor-dot:nth-child(3) span {
   top: -1em;
   left: 4em;
 }
+.sensor-dot div {
+  position: absolute;
+  font-size: 32px;
+  background: var(--btn-color-red);
+  color: var(--main-color-white);
+  padding: 5px 15px;
+  width: fit-content;
+  border-radius: 50%;
+  font-weight: 700;
+  transform: translate(-50%, -50%);
+}
 .sensor-svg {
   position: absolute;
   top: 0;
@@ -110,6 +122,51 @@ div.sensor-dot:nth-child(3) span {
   height: 100%;
   pointer-events: none;
   z-index: 1;
+}
+.model-coordinate {
+  position: absolute;
+  background: var(--main-color-black);
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+.model-coordinate__x {
+  width: 110%;
+  height: 2px;
+}
+.model-coordinate__y {
+  height: 100%;
+  width: 2px;
+}
+.model-coordinate__x::after {
+  content: "X";
+  position: absolute;
+  top: 1em;
+  right: 0;
+}
+.model-coordinate__y::after {
+  content: "Y";
+  position: absolute;
+  top: calc(100% - 1em);
+  right: 1em;
+}
+.model-coordinate::before {
+  content: '';
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  border-right: 2px solid var(--main-color-black);
+  border-bottom: 2px solid var(--main-color-black);
+}
+.model-coordinate__x::before {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(-1px) rotate(-45deg);
+}
+.model-coordinate__y::before {
+  right: 0;
+  top: 100%;
+  transform: translateY(calc(-100% - 1px)) translateX(calc(50% - 1px)) rotate(45deg);
 }
 
 /* Кнопки на макете */
@@ -141,16 +198,16 @@ div.sensor-dot:nth-child(3) span {
   gap: 10px;
 }
 .sidebar.open {
-  width: 250px;
+  width: 500px;
 }
 .menu-content {
   opacity: 0;
   transition: .5s;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
   gap: 10px;
   min-width: 230px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 .sidebar.open .menu-content {
   opacity: 1;
@@ -234,6 +291,7 @@ div.sensor-dot:nth-child(3) span {
   border: 2px solid var(--btn-color-gray);
   margin: 0;
   width: 100%;
+  margin-bottom: 20px;
 }
 .menu-fieldset legend {
   text-align: center;
@@ -263,6 +321,11 @@ div.sensor-dot:nth-child(3) span {
   padding: 5px;
   transition: all .3s;
   display: block;
+}
+.menu-db button:disabled {
+  background-color: var(--btn-color-red);
+  border: 1px solid var(--btn-color-red);
+  cursor: not-allowed;
 }
 .menu-radio input[type="radio"] {
   display: none;
@@ -535,3 +598,27 @@ div.sensor-dot:nth-child(3) span {
   pointer-events: none;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+.overlay .spinner {
+  width: 60px;
+  height: 60px;
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
