@@ -714,8 +714,8 @@ export function App() {
             setIsExperimentEnded(false);
             alert("Измерения удалены");
         } catch (error) {
-            console.error("Ошибка при удалении точек:", error);
-            alert("Ошибка при удалении точек: " + error.message);
+            console.error("Ошибка при удалении измерений:", error);
+            alert("Ошибка при удалении измерений: " + error.message);
         } finally {
             setIsLoading(false);
         }
