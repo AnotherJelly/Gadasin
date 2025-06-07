@@ -100,7 +100,7 @@ function MenuFilter({ openModal, onInputDate, fetchData, savePoint, deletePoints
     );    
 }
 
-function MenuElement({ index, point, active, onClick }) {
+function MenuElement({ index, point, active, onClick, length }) {
     const dateTime = new Date(point?.timestamp * 1000 - new Date().getTimezoneOffset() * 60000);
     const [date, time] = dateTime?.toISOString().split("T");
 
@@ -109,7 +109,7 @@ function MenuElement({ index, point, active, onClick }) {
             className={`menu-list__element ${active ? "active" : ""}`} 
             onClick={onClick}
         >
-            <div>{index + 1}. {point.x} {settings.units}, {point.y} {settings.units}</div>
+            <div>{length - index}. {point.x} {settings.units}, {point.y} {settings.units}</div>
             <div>Дата: {date}</div>
             <div>Время: {time.split(".")[0]}</div>
         </div>
@@ -131,6 +131,7 @@ function MenuList({ title, points, activeIndexes, toggleActive, haveSaved }) {
                                 point={point} 
                                 active={activeIndexes.includes(index)} 
                                 onClick={() => toggleActive(index)}
+                                length={points?.length}
                             />
                             {index === 0 && haveSaved && (
                                 <div>Сохранённые Измерения</div>
@@ -294,12 +295,12 @@ function Model({ points, activeIndexes, sensors }) {
 
                                 const handleClick = () => {
                                     if (infoBox?.index === index) {
-                                        setInfoBox(null); // Скрыть, если уже открыт
+                                        setInfoBox(null);
                                     } else {
                                         if (point?.timestamp != null) {
                                             const dateTime = new Date(point.timestamp * 1000);
                                             const [date, timeFull] = dateTime.toISOString().split("T");
-                                            const time = timeFull.split(".")[0]; // убираем миллисекунды
+                                            const time = timeFull.split(".")[0];
                                             setInfoBox({
                                                 index,
                                                 date,
@@ -316,7 +317,7 @@ function Model({ points, activeIndexes, sensors }) {
                                             className={`object-button`}
                                             style={{ top: `${top}%`, left: `${left}%` }}
                                         >
-                                            {index + 1}
+                                            {points?.length - index}
                                         </button>
                                         {infoBox?.index === index && (
                                             <div
@@ -775,10 +776,18 @@ export function App() {
             Promise.all([
                 fetch(urlSaved)
                     .then(res => res.ok ? res.json() : { locationPoints: [] })
-                    .catch(() => ({ locationPoints: [] })),
+                    .catch((err) => {
+                        ({ locationPoints: [] });
+                        console.error("Ошибка загрузки:", err);
+                        alert("Ошибка загрузки: " + err.message);
+                    }),
                 fetch(`${settings.api.url}?object_id=${settings.api.objectId}`)
                     .then(res => res.ok ? res.json() : { locationPoints: [] })
-                    .catch(() => ({ locationPoints: [] })),
+                    .catch((err) => {
+                        ({ locationPoints: [] });
+                        console.error("Ошибка загрузки:", err);
+                        alert("Ошибка загрузки: " + err.message);
+                    }),
             ])
                 .then(([savedData, rawData]) => {
                     const combined = [...rawData.locationPoints, ...savedData.locationPoints];
